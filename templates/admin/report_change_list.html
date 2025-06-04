@@ -1,0 +1,14 @@
+<xaiArtifact artifact_id="0a0850ea-52c2-4882-b076-84ac0c5a031e" artifact_version_id="9a99c2d1-cfee-458b-b2f7-00d7f05e0821" title="report_change_list.html" contentType="text/html">
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="dashboard-content">
+        {% include "admin/dashboard.html" %}
+    </div>
+{% endblock %}
+</xaiArtifactEnd>

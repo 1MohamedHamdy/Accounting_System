@@ -1,0 +1,54 @@
+name: ${SERVER_NAME:-local}
+
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-admin}
+      - POSTGRES_USER=${POSTGRES_USER:-admin}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-admin}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d admin" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: always
+    ports:
+      - ${PGADMIN_PORT:-5050}:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL:-admin@admin.com}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD:-admin}
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  
+  account_server:
+    build:
+      context: .
+    ports:
+      - "${SERVER_PORT:-8000}:8000"
+    restart: on-failure
+    command: bash -c "
+      python manage.py collectstatic --no-input &&
+      python manage.py migrate &&
+      uvicorn project.asgi:application --host 0.0.0.0 --port 8000 --reload 2>&1 | tee -a /account_server/logs/server.log"
+    volumes:
+      - .:/account_server
+      - ./logs:/account_server/logs
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
+  pgadmin_data:

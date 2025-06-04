@@ -1,0 +1,832 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-06-04 07:44+0000\n"
+"PO-Revision-Date: 2025-05-28 13:40+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Arabic <ar@li.org>\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+#: accounting/admin.py:35
+msgid "Client Phone Number"
+msgstr "رقم هاتف العميل"
+
+#: accounting/admin.py:36
+msgid "Client Phone Numbers"
+msgstr "أرقام هواتف العميل"
+
+#: accounting/admin.py:40
+msgid "Supplier Phone Number"
+msgstr "رقم هاتف المورد"
+
+#: accounting/admin.py:41
+msgid "Supplier Phone Numbers"
+msgstr "أرقام هواتف المورد"
+
+#: accounting/admin.py:54
+msgid "Identification"
+msgstr "الهوية"
+
+#: accounting/admin.py:56
+msgid "National ID for individuals, Tax number for companies"
+msgstr "الهوية الوطنية للأفراد، الرقم الضريبي للشركات"
+
+#: accounting/admin.py:58 accounting/admin.py:80
+msgid "Statistics"
+msgstr "الإحصائيات"
+
+#: accounting/admin.py:74
+msgid "Cooperation"
+msgstr "التعاون"
+
+#: accounting/admin.py:77 accounting/models.py:352
+msgid "Payment"
+msgstr "الدفع"
+
+#: accounting/admin.py:98
+msgid "Pricing"
+msgstr "التسعير"
+
+#: accounting/admin.py:101 templates/admin/dashboard.html:207
+msgid "Inventory"
+msgstr "المخزون"
+
+#: accounting/admin.py:104
+msgid "Images"
+msgstr "الصور"
+
+#: accounting/admin.py:106
+msgid "QR code is automatically generated based on product name and code."
+msgstr "يتم إنشاء رمز الاستجابة السريعة تلقائيًا بناءً على اسم المنتج والكود."
+
+#: accounting/admin.py:114 accounting/admin.py:123
+msgid "QR Code for"
+msgstr "رمز الاستجابة السريعة لـ"
+
+#: accounting/admin.py:117 accounting/models.py:143
+msgid "QR Code"
+msgstr "رمز الاستجابة السريعة"
+
+#: accounting/admin.py:125
+msgid "No QR code available."
+msgstr "لا يوجد رمز استجابة سريعة متاح."
+
+#: accounting/admin.py:126
+msgid "QR Code Preview"
+msgstr "معاينة رمز الاستجابة السريعة"
+
+#: accounting/admin.py:131 accounting/models.py:190
+#: templates/admin/dashboard.html:217
+msgid "Low Stock"
+msgstr "مخزون منخفض"
+
+#: accounting/admin.py:132 accounting/models.py:191
+msgid "In Stock"
+msgstr "في المخزون"
+
+#: accounting/admin.py:133 accounting/admin.py:146
+msgid "Stock Status"
+msgstr "حالة المخزون"
+
+#: accounting/admin.py:137
+msgid "You do not have permission to export products."
+msgstr "ليس لديك إذن لتصدير المنتجات."
+
+#: accounting/admin.py:142 accounting/models.py:195
+msgid "Products"
+msgstr "المنتجات"
+
+#: accounting/admin.py:145 accounting/models.py:62 accounting/models.py:102
+#: accounting/models.py:141
+msgid "Name"
+msgstr "الاسم"
+
+#: accounting/admin.py:145 accounting/models.py:142
+msgid "Code"
+msgstr "الكود"
+
+#: accounting/admin.py:145 accounting/models.py:144
+msgid "Wholesale Price"
+msgstr "سعر الجملة"
+
+#: accounting/admin.py:145 accounting/models.py:145
+msgid "Retail Price"
+msgstr "سعر التجزئة"
+
+#: accounting/admin.py:146 accounting/models.py:149
+msgid "Quantity in Stock"
+msgstr "الكمية في المخزون"
+
+#: accounting/admin.py:146 accounting/models.py:148
+msgid "Reorder Level"
+msgstr "مستوى إعادة الطلب"
+
+#: accounting/admin.py:146 accounting/admin.py:561 accounting/models.py:51
+#: accounting/models.py:118 accounting/models.py:152 accounting/models.py:224
+#: templates/admin/dashboard.html:112
+msgid "Supplier"
+msgstr "المورد"
+
+#: accounting/admin.py:172
+msgid "Export selected products to Excel"
+msgstr "تصدير المنتجات المختارة إلى Excel"
+
+#: accounting/admin.py:178 accounting/models.py:306
+msgid "Invoice Item"
+msgstr "عنصر الفاتورة"
+
+#: accounting/admin.py:179 accounting/models.py:307
+msgid "Invoice Items"
+msgstr "عناصر الفاتورة"
+
+#: accounting/admin.py:196 accounting/admin.py:208
+#: templates/admin/dashboard.html:323
+msgid "Client/Supplier"
+msgstr "العميل/المورد"
+
+#: accounting/admin.py:200
+msgid "You do not have permission to export invoices."
+msgstr "ليس لديك إذن لتصدير الفواتير."
+
+#: accounting/admin.py:205 accounting/models.py:267
+msgid "Invoices"
+msgstr "الفواتير"
+
+#: accounting/admin.py:208 accounting/admin.py:523 accounting/admin.py:561
+#: accounting/models.py:219
+msgid "Invoice Number"
+msgstr "رقم الفاتورة"
+
+#: accounting/admin.py:208 accounting/admin.py:523 accounting/admin.py:561
+#: templates/admin/dashboard.html:321 templates/admin/dashboard.html:391
+#: templates/admin/dashboard.html:436
+msgid "Date"
+msgstr "التاريخ"
+
+#: accounting/admin.py:208 templates/admin/dashboard.html:322
+msgid "Type"
+msgstr "النوع"
+
+#: accounting/admin.py:209 accounting/admin.py:523 accounting/admin.py:561
+#: accounting/models.py:225
+msgid "Total Amount"
+msgstr "المبلغ الإجمالي"
+
+#: accounting/admin.py:209 accounting/admin.py:524 accounting/admin.py:562
+#: accounting/models.py:222
+msgid "Payment Status"
+msgstr "حالة الدفع"
+
+#: accounting/admin.py:209 accounting/admin.py:524 accounting/admin.py:562
+msgid "Items Count"
+msgstr "عدد العناصر"
+
+#: accounting/admin.py:234
+msgid "Export selected invoices to Excel"
+msgstr "تصدير الفواتير المختارة إلى Excel"
+
+#: accounting/admin.py:238
+msgid "You do not have permission to mark invoices as paid."
+msgstr "ليس لديك إذن لتسجيل الفواتير كمدفوعة."
+
+#: accounting/admin.py:241
+#, python-format
+msgid "%(count)s invoices marked as paid."
+msgstr "تم تسجيل %(count)s فاتورة كمدفوعة."
+
+#: accounting/admin.py:242
+msgid "Mark selected invoices as paid"
+msgstr "تسجيل الفواتير المختارة كمدفوعة"
+
+#: accounting/admin.py:246
+msgid "You do not have permission to mark invoices as unpaid."
+msgstr "ليس لديك إذن لتسجيل الفواتير كغير مدفوعة."
+
+#: accounting/admin.py:249
+#, python-format
+msgid "%(count)s invoices marked as unpaid."
+msgstr "تم تسجيل %(count)s فاتورة كغير مدفوعة."
+
+#: accounting/admin.py:250
+msgid "Mark selected invoices as unpaid"
+msgstr "تسجيل الفواتير المختارة كغير مدفوعة"
+
+#: accounting/admin.py:262
+msgid "Remaining Amount"
+msgstr "المبلغ المتبقي"
+
+#: accounting/admin.py:399 templates/admin/dashboard.html:147
+#: templates/admin/dashboard.html:560
+msgid "Sales"
+msgstr "المبيعات"
+
+#: accounting/admin.py:406 templates/admin/dashboard.html:177
+#: templates/admin/dashboard.html:566
+msgid "Purchases"
+msgstr "المشتريات"
+
+#: accounting/admin.py:419
+msgid "Amount ($)"
+msgstr "المبلغ ($)"
+
+#: accounting/admin.py:503
+msgid "You do not have permission to view sales reports."
+msgstr "ليس لديك إذن لعرض تقارير المبيعات."
+
+#: accounting/admin.py:523 accounting/models.py:48 accounting/models.py:79
+#: accounting/models.py:223 templates/admin/dashboard.html:102
+#: templates/admin/dashboard.html:393 templates/admin/dashboard.html:437
+msgid "Client"
+msgstr "العميل"
+
+#: accounting/admin.py:541
+msgid "You do not have permission to view purchases reports."
+msgstr "ليس لديك إذن لعرض تقارير المشتريات."
+
+#: accounting/admin.py:579
+msgid "Accounting System Dashboard"
+msgstr "لوحة تحكم نظام المحاسبة"
+
+#: accounting/admin.py:580
+msgid "Accounting Dashboard"
+msgstr "لوحة تحكم المحاسبة"
+
+#: accounting/models.py:34
+msgid "Created At"
+msgstr "تاريخ الإنشاء"
+
+#: accounting/models.py:35
+msgid "Updated At"
+msgstr "تاريخ التحديث"
+
+#: accounting/models.py:41
+msgid "Phone Number"
+msgstr "رقم الهاتف"
+
+#: accounting/models.py:42 accounting/models.py:151
+msgid "Description"
+msgstr "الوصف"
+
+#: accounting/models.py:52
+msgid "Is Main"
+msgstr "رئيسي"
+
+#: accounting/models.py:58 accounting/models.py:91
+msgid "Individual"
+msgstr "فرد"
+
+#: accounting/models.py:59 accounting/models.py:92
+msgid "Company"
+msgstr "شركة"
+
+#: accounting/models.py:63 accounting/models.py:104
+msgid "Business Type"
+msgstr "نوع العمل"
+
+#: accounting/models.py:64
+msgid "National ID"
+msgstr "الهوية الوطنية"
+
+#: accounting/models.py:65 accounting/models.py:103
+msgid "Tax Number"
+msgstr "الرقم الضريبي"
+
+#: accounting/models.py:66 accounting/models.py:105
+msgid "Address"
+msgstr "العنوان"
+
+#: accounting/models.py:67
+msgid "Number of Invoices"
+msgstr "عدد الفواتير"
+
+#: accounting/models.py:71
+msgid "National ID is required for individual clients"
+msgstr "الهوية الوطنية مطلوبة للعملاء الأفراد"
+
+#: accounting/models.py:73
+msgid "Tax number is required for company clients"
+msgstr "الرقم الضريبي مطلوب لعملاء الشركات"
+
+#: accounting/models.py:80 templates/admin/dashboard.html:243
+msgid "Clients"
+msgstr "العملاء"
+
+#: accounting/models.py:98
+msgid "30 Days"
+msgstr "30 يومًا"
+
+#: accounting/models.py:99
+msgid "60 Days"
+msgstr "60 يومًا"
+
+#: accounting/models.py:106
+msgid "Supplier Code"
+msgstr "كود المورد"
+
+#: accounting/models.py:107
+msgid "Cooperation Start Date"
+msgstr "تاريخ بدء التعاون"
+
+#: accounting/models.py:108
+msgid "Cooperation End Date"
+msgstr "تاريخ انتهاء التعاون"
+
+#: accounting/models.py:109
+msgid "Website"
+msgstr "الموقع الإلكتروني"
+
+#: accounting/models.py:110 accounting/models.py:324
+msgid "Payment Method"
+msgstr "طريقة الدفع"
+
+#: accounting/models.py:111
+msgid "Total Orders"
+msgstr "إجمالي الطلبات"
+
+#: accounting/models.py:112
+msgid "Terms and Conditions"
+msgstr "الشروط والأحكام"
+
+#: accounting/models.py:119
+msgid "Suppliers"
+msgstr "الموردين"
+
+#: accounting/models.py:130 accounting/models.py:322
+#: templates/admin/dashboard.html:324 templates/admin/dashboard.html:394
+#: templates/admin/dashboard.html:438
+msgid "Amount"
+msgstr "المبلغ"
+
+#: accounting/models.py:131
+msgid "Percent"
+msgstr "نسبة مئوية"
+
+#: accounting/models.py:137
+msgid "Wholesale"
+msgstr "الجملة"
+
+#: accounting/models.py:138
+msgid "Retail"
+msgstr "التجزئة"
+
+#: accounting/models.py:146
+msgid "Tax Type"
+msgstr "نوع الضريبة"
+
+#: accounting/models.py:147
+msgid "Tax Value"
+msgstr "قيمة الضريبة"
+
+#: accounting/models.py:150
+msgid "Image"
+msgstr "الصورة"
+
+#: accounting/models.py:194 accounting/models.py:275
+msgid "Product"
+msgstr "المنتج"
+
+#: accounting/models.py:206
+msgid "Purchase"
+msgstr "الشراء"
+
+#: accounting/models.py:207
+msgid "Sale"
+msgstr "البيع"
+
+#: accounting/models.py:214
+msgid "Paid"
+msgstr "مدفوع"
+
+#: accounting/models.py:215 templates/admin/dashboard.html:161
+#: templates/admin/dashboard.html:191
+msgid "Unpaid"
+msgstr "غير مدفوع"
+
+#: accounting/models.py:216
+msgid "Pending"
+msgstr "معلق"
+
+#: accounting/models.py:220
+msgid "Invoice Date"
+msgstr "تاريخ الفاتورة"
+
+#: accounting/models.py:221
+msgid "Invoice Type"
+msgstr "نوع الفاتورة"
+
+#: accounting/models.py:226 accounting/models.py:325
+msgid "Notes"
+msgstr "ملاحظات"
+
+#: accounting/models.py:230
+msgid "Client is required for sales invoices"
+msgstr "العميل مطلوب لفواتير البيع"
+
+#: accounting/models.py:232
+msgid "Supplier is required for purchase invoices"
+msgstr "المورد مطلوب لفواتير الشراء"
+
+#: accounting/models.py:240
+msgid "Could not generate a unique invoice number"
+msgstr "تعذر إنشاء رقم فاتورة فريد"
+
+#: accounting/models.py:266 accounting/models.py:274 accounting/models.py:321
+msgid "Invoice"
+msgstr "الفاتورة"
+
+#: accounting/models.py:276
+msgid "Quantity"
+msgstr "الكمية"
+
+#: accounting/models.py:277
+msgid "Price"
+msgstr "السعر"
+
+#: accounting/models.py:278
+msgid "Tax Amount"
+msgstr "مبلغ الضريبة"
+
+#: accounting/models.py:279
+msgid "Discount"
+msgstr "الخصم"
+
+#: accounting/models.py:280
+msgid "Total"
+msgstr "الإجمالي"
+
+#: accounting/models.py:315
+msgid "Cash"
+msgstr "نقدًا"
+
+#: accounting/models.py:316
+msgid "Check"
+msgstr "شيك"
+
+#: accounting/models.py:317
+msgid "Bank Transfer"
+msgstr "تحويل بنكي"
+
+#: accounting/models.py:318
+msgid "Credit Card"
+msgstr "بطاقة ائتمان"
+
+#: accounting/models.py:323
+msgid "Payment Date"
+msgstr "تاريخ الدفع"
+
+#: accounting/models.py:353
+msgid "Payments"
+msgstr "المدفوعات"
+
+#: accounting/models.py:361 accounting/models.py:362
+msgid "Dashboard Statistics"
+msgstr "إحصائيات لوحة التحكم"
+
+#: accounting/templates/admin/custom_date_filter.html:11
+#: templates/admin/custom_date_filter.html:11
+msgid "من"
+msgstr "من"
+
+#: accounting/templates/admin/custom_date_filter.html:14
+#: templates/admin/custom_date_filter.html:14
+msgid "إلى"
+msgstr "إلى"
+
+#: accounting/templates/admin/custom_date_filter.html:19
+#: templates/admin/custom_date_filter.html:19
+msgid "تطبيق"
+msgstr "تطبيق"
+
+#: templates/admin/base.html:3
+msgid "Django site admin"
+msgstr "إدارة موقع Django"
+
+#: templates/admin/base.html:6
+msgid "Django administration"
+msgstr "إدارة Django"
+
+#: templates/admin/custom_index.html:17
+msgid "Home"
+msgstr "الرئيسية"
+
+#: templates/admin/dashboard.html:8
+msgid "Dashboard"
+msgstr "نظرة عامة على لوحة التحكم"
+
+#: templates/admin/dashboard.html:19
+msgid "Dashboard Overview"
+msgstr "نظرة عامة على لوحة التحكم"
+
+#: templates/admin/dashboard.html:43
+msgid "Alerts & Notifications"
+msgstr "التنبيهات والإشعارات"
+
+#: templates/admin/dashboard.html:54
+msgid "Low Stock Alert"
+msgstr "تنبيه انخفاض المخزون"
+
+#: templates/admin/dashboard.html:56
+msgid ""
+"\n"
+"                                Product <a "
+"href=\"%(notification.admin_url)s\">%(name)s (%(code)s)</a> has %(stock)s "
+"units in stock (Reorder Level: %(reorder)s).\n"
+"                                "
+msgstr ""
+"\n"
+"                                تنبيه انخفاض المخزون: المنتج <a "
+"href=\"%(notification.admin_url)s\">%(name)s (%(code)s)</a> لديه %(stock)s "
+"وحدة في المخزون (مستوى إعادة الطلب: %(reorder)s).\n"
+"                                "
+
+#: templates/admin/dashboard.html:70
+msgid "All Good!"
+msgstr "كل شيء على ما يرام!"
+
+#: templates/admin/dashboard.html:71
+msgid "No low stock products found."
+msgstr "لم يتم العثور على منتجات منخفضة المخزون."
+
+#: templates/admin/dashboard.html:82
+msgid "Data Filters"
+msgstr "مرشحات البيانات"
+
+#: templates/admin/dashboard.html:93
+msgid "Date Range"
+msgstr "نطاق التاريخ"
+
+#: templates/admin/dashboard.html:96
+msgid "to"
+msgstr "إلى"
+
+#: templates/admin/dashboard.html:104
+msgid "All Clients"
+msgstr "جميع العملاء"
+
+#: templates/admin/dashboard.html:114
+msgid "All Suppliers"
+msgstr "جميع الموردين"
+
+#: templates/admin/dashboard.html:124
+msgid "Apply Filters"
+msgstr "تطبيق المرشحات"
+
+#: templates/admin/dashboard.html:128
+msgid "Reset"
+msgstr "إعادة تعيين"
+
+#: templates/admin/dashboard.html:139
+msgid "Key Performance Indicators"
+msgstr "مؤشرات الأداء الرئيسية"
+
+#: templates/admin/dashboard.html:153 templates/admin/dashboard.html:183
+#: templates/admin/dashboard.html:589
+msgid "EGP"
+msgstr ""
+
+#: templates/admin/dashboard.html:157 templates/admin/dashboard.html:187
+msgid "Last 30 Days"
+msgstr "آخر 30 يومًا"
+
+#: templates/admin/dashboard.html:169 templates/admin/dashboard.html:199
+msgid "Generate Report"
+msgstr "إنشاء التقرير"
+
+#: templates/admin/dashboard.html:213
+msgid "Items"
+msgstr "العناصر"
+
+#: templates/admin/dashboard.html:221
+msgid "Out of Stock"
+msgstr "نفاد المخزون"
+
+#: templates/admin/dashboard.html:229
+msgid "View Inventory"
+msgstr "عرض المخزون"
+
+#: templates/admin/dashboard.html:237
+msgid "Clients & Suppliers"
+msgstr "العملاء والموردين"
+
+#: templates/admin/dashboard.html:247
+msgid "Active Clients"
+msgstr "العملاء النشطين"
+
+#: templates/admin/dashboard.html:251
+msgid "Active Suppliers"
+msgstr "الموردين النشطين"
+
+#: templates/admin/dashboard.html:259
+msgid "View Contacts"
+msgstr "عرض جهات الاتصال"
+
+#: templates/admin/dashboard.html:271
+msgid "Sales & Purchases Trend"
+msgstr "اتجاه المبيعات والمشتريات"
+
+#: templates/admin/dashboard.html:276
+msgid "Monthly"
+msgstr "شهريًا"
+
+#: templates/admin/dashboard.html:279
+msgid "Quarterly"
+msgstr "ربع سنوي"
+
+#: templates/admin/dashboard.html:282
+msgid "Yearly"
+msgstr "سنويًا"
+
+#: templates/admin/dashboard.html:296
+msgid "Recent Activity"
+msgstr "الأنشطة الأخيرة"
+
+#: templates/admin/dashboard.html:302
+msgid "Recent Invoices"
+msgstr "الفواتير الأخيرة"
+
+#: templates/admin/dashboard.html:306
+msgid "Recent Payments"
+msgstr "المدفوعات الأخيرة"
+
+#: templates/admin/dashboard.html:310
+msgid "Recent Orders"
+msgstr "الطلبات الأخيرة"
+
+#: templates/admin/dashboard.html:320 templates/admin/dashboard.html:392
+#: templates/admin/dashboard.html:435
+msgid "Invoice #"
+msgstr "رقم الفاتورة"
+
+#: templates/admin/dashboard.html:325 templates/admin/dashboard.html:439
+msgid "Status"
+msgstr "الحالة"
+
+#: templates/admin/dashboard.html:326 templates/admin/dashboard.html:440
+msgid "Actions"
+msgstr "الإجراءات"
+
+#: templates/admin/dashboard.html:358 templates/admin/dashboard.html:461
+msgid "View"
+msgstr "عرض"
+
+#: templates/admin/dashboard.html:361
+msgid "Print"
+msgstr "طباعة"
+
+#: templates/admin/dashboard.html:370
+msgid "No recent invoices found."
+msgstr "لم يتم العثور على فواتير حديثة."
+
+#: templates/admin/dashboard.html:379
+msgid "View All Invoices"
+msgstr "عرض جميع الفواتير"
+
+#: templates/admin/dashboard.html:390
+msgid "Payment #"
+msgstr "الدفع"
+
+#: templates/admin/dashboard.html:395
+msgid "Method"
+msgstr "طريقة الدفع"
+
+#: templates/admin/dashboard.html:415
+msgid "No recent payments found."
+msgstr "لم يتم العثور على فواتير حديثة."
+
+#: templates/admin/dashboard.html:424
+msgid "View All Payments"
+msgstr "عرض جميع الفواتير"
+
+#: templates/admin/dashboard.html:470
+msgid "No recent orders found."
+msgstr "لم يتم العثور على فواتير حديثة."
+
+#: templates/admin/dashboard.html:479
+msgid "View All Orders"
+msgstr "عرض جميع الفواتير"
+
+#: templates/admin/dashboard.html:488
+msgid "Quick Actions"
+msgstr "الإجراءات السريعة"
+
+#: templates/admin/dashboard.html:496
+msgid "Create Sale"
+msgstr "إنشاء بيع"
+
+#: templates/admin/dashboard.html:497
+msgid "Record a new sales invoice"
+msgstr "تسجيل فاتورة بيع جديدة"
+
+#: templates/admin/dashboard.html:504
+msgid "Create Purchase"
+msgstr "إنشاء شراء"
+
+#: templates/admin/dashboard.html:505
+msgid "Record a new purchase invoice"
+msgstr "تسجيل فاتورة شراء جديدة"
+
+#: templates/admin/dashboard.html:512
+msgid "Add Client"
+msgstr "إضافة عميل"
+
+#: templates/admin/dashboard.html:513
+msgid "Register a new client"
+msgstr "تسجيل عميل جديد"
+
+#: templates/admin/dashboard.html:520
+msgid "Add Supplier"
+msgstr "إضافة مورد"
+
+#: templates/admin/dashboard.html:521
+msgid "Register a new supplier"
+msgstr "تسجيل مورد جديد"
+
+#: templates/admin/dashboard.html:528
+msgid "Add Product"
+msgstr "إضافة منتج"
+
+#: templates/admin/dashboard.html:529
+msgid "Add a new inventory item"
+msgstr "إضافة عنصر مخزون جديد"
+
+#: templates/admin/dashboard.html:536
+msgid "Record Payment"
+msgstr "تسجيل دفعة"
+
+#: templates/admin/dashboard.html:537
+msgid "Record a payment transaction"
+msgstr "تسجيل معاملة دفع"
+
+#: templates/admin/dashboard.html:599
+msgid "Amount (EGP)"
+msgstr "المبلغ ($)"
+
+#: templates/admin/dashboard.html:614
+msgid "Month"
+msgstr "الشهر"
+
+#: templates/admin/dashboard.html:730
+msgid "Failed to update chart. Please try again."
+msgstr ""
+
+#~ msgid "USD"
+#~ msgstr "دولار أمريكي"
+
+#~ msgid "Amount (USD)"
+#~ msgstr "المبلغ (دولار أمريكي)"
+
+#~ msgid "From Date:"
+#~ msgstr "من التاريخ:"
+
+#~ msgid "To Date:"
+#~ msgstr "إلى التاريخ:"
+
+#~ msgid "Client:"
+#~ msgstr "العميل:"
+
+#~ msgid "Supplier:"
+#~ msgstr "المورد:"
+
+#~ msgid "Total Sales:"
+#~ msgstr "إجمالي المبيعات:"
+
+#~ msgid "Unpaid Sales:"
+#~ msgstr "المبيعات غير المدفوعة:"
+
+#~ msgid "Purchases Overview"
+#~ msgstr "نظرة عامة على المشتريات"
+
+#~ msgid "Total Purchases:"
+#~ msgstr "إجمالي المشتريات:"
+
+#~ msgid "Unpaid Purchases:"
+#~ msgstr "المشتريات غير المدفوعة:"
+
+#~ msgid "Generate Purchases Report"
+#~ msgstr "إنشاء تقرير المشتريات"
+
+#~ msgid "Inventory Status"
+#~ msgstr "حالة المخزون"
+
+#~ msgid "Low Stock Products:"
+#~ msgstr "المنتجات منخفضة المخزون:"
+
+#~ msgid "View Low Stock"
+#~ msgstr "عرض المنتجات منخفضة المخزون"
+
+#~ msgid "Total Clients:"
+#~ msgstr "إجمالي العملاء:"
+
+#~ msgid "Total Suppliers:"
+#~ msgstr "إجمالي الموردين:"

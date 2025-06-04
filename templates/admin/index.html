@@ -1,0 +1,25 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<h1 style="margin-bottom: 30px;">📊 Accounting Dashboard</h1>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap;">
+  <div style="flex: 1; min-width: 300px; background: #e9f5e9; padding: 20px; border-radius: 10px;">
+    <h2>✅ Today’s Sales</h2>
+    <p style="font-size: 24px; font-weight: bold;">{{ today_sales }}</p>
+  </div>
+
+  <div style="flex: 2; min-width: 400px; background: #f0f0ff; padding: 20px; border-radius: 10px;">
+    <h2>📉 Sales Chart</h2>
+    {{ sales_chart|safe }}
+  </div>
+</div>
+
+<div style="margin-top: 40px; background: #fff7e6; padding: 20px; border-radius: 10px;">
+  <h2>🏅 Top 5 Clients</h2>
+  {{ top_clients|safe }}
+</div>
+
+{{ block.super }}
+{% endblock %}

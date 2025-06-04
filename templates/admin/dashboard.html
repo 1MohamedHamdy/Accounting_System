@@ -1,0 +1,1804 @@
+{% load static humanize i18n %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_CODE == 'ar' %}dir="rtl"{% else %}dir="ltr"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Dashboard" %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="dashboard-container">
+    <!-- Dashboard Header with Language Switcher -->
+    <header class="dashboard-header">
+        <div class="header-content">
+            <h1 class="dashboard-title">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>{% trans "Dashboard Overview" %}</span>
+            </h1>
+            <div class="header-actions">
+                <div class="language-switcher">
+                    <form action="{% url 'set_language' %}" method="post">
+                        {% csrf_token %}
+                        <select name="language" onchange="this.form.submit()" class="language-select">
+                            {% get_current_language as LANGUAGE_CODE %}
+                            {% get_available_languages as LANGUAGES %}
+                            {% for lang in LANGUAGES %}
+                                <option value="{{ lang.0 }}" {% if lang.0 == LANGUAGE_CODE %}selected{% endif %}>
+                                    {{ lang.1 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Notification Center -->
+    <section class="notification-center">
+        <h2 class="section-title">
+            <span class="title-text">{% trans "Alerts & Notifications" %}</span>
+            <i class="fas fa-bell"></i>
+        </h2>
+        <div class="notifications-grid">
+            {% if low_stock_notifications %}
+                {% for notification in low_stock_notifications %}
+                    <div class="notification-card alert">
+                        <div class="notification-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h3>{% trans "Low Stock Alert" %}</h3>
+                            <p>
+                                {% blocktrans with name=notification.name code=notification.code stock=notification.quantity_in_stock reorder=notification.reorder_level %}
+                                Product <a href="{{ notification.admin_url }}">{{ name }} ({{ code }})</a> has {{ stock }} units in stock (Reorder Level: {{ reorder }}).
+                                {% endblocktrans %}
+                            </p>
+                        </div>
+                        <div class="notification-time">{% now "H:i" %}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="notification-card info">
+                    <div class="notification-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="notification-content">
+                        <h3>{% trans "All Good!" %}</h3>
+                        <p>{% trans "No low stock products found." %}</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Filter Panel -->
+    <section class="filter-panel">
+        <div class="filter-header">
+            <h2 class="section-title">
+                <span class="title-text">{% trans "Data Filters" %}</span>
+                <i class="fas fa-filter"></i>
+            </h2>
+            <button class="filter-toggle" aria-expanded="false">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+        <div class="filter-content">
+            <form method="get" action="{% url 'admin:accounting_dashboardstats' %}" class="filter-form">
+                <div class="form-row">
+                    <div class="form-group date-range">
+                        <label for="from_date">{% trans "Date Range" %}</label>
+                        <div class="date-inputs">
+                            <input type="date" id="from_date" name="from_date" value="{{ from_date|default_if_none:'' }}" class="filter-input">
+                            <span class="date-separator">{% trans "to" %}</span>
+                            <input type="date" id="to_date" name="to_date" value="{{ to_date|default_if_none:'' }}" class="filter-input">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="client">{% trans "Client" %}</label>
+                        <select id="client" name="client" class="filter-input">
+                            <option value="">{% trans "All Clients" %}</option>
+                            {% for client in clients %}
+                                <option value="{{ client.id }}" {% if selected_client|stringformat:"s" == client.id|stringformat:"s" %}selected{% endif %}>{{ client.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="supplier">{% trans "Supplier" %}</label>
+                        <select id="supplier" name="supplier" class="filter-input">
+                            <option value="">{% trans "All Suppliers" %}</option>
+                            {% for supplier in suppliers %}
+                                <option value="{{ supplier.id }}" {% if selected_supplier|stringformat:"s" == supplier.id|stringformat:"s" %}selected{% endif %}>{{ supplier.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group actions">
+                        <button type="submit" class="filter-button primary">
+                            <i class="fas fa-search"></i>
+                            {% trans "Apply Filters" %}
+                        </button>
+                        <a href="{% url 'admin:accounting_dashboardstats' %}" class="filter-button secondary">
+                            <i class="fas fa-times"></i>
+                            {% trans "Reset" %}
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Key Metrics Section -->
+    <section class="metrics-section">
+        <h2 class="section-title">
+            <span class="title-text">{% trans "Key Performance Indicators" %}</span>
+            <i class="fas fa-chart-bar"></i>
+        </h2>
+        
+        <div class="metrics-grid">
+            <!-- Sales Metrics -->
+            <div class="metric-card sales">
+                <div class="metric-header">
+                    <h3>{% trans "Sales" %}</h3>
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="metric-body">
+                    <div class="metric-value">
+                        <span class="amount">{{ total_sales|floatformat:2|intcomma }}</span>
+                        <span class="currency">{% trans "EGP" %}</span>
+                    </div>
+                    <div class="metric-details">
+                        <div class="detail-item">
+                            <span class="label">{% trans "Last 30 Days" %}</span>
+                            <span class="value">{{ recent_sales|floatformat:2|intcomma }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">{% trans "Unpaid" %}</span>
+                            <span class="value">{{ unpaid_sales|floatformat:2|intcomma }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-footer">
+                    <a href="{% url 'admin:accounting_sales_report' %}?from_date={{ from_date|default_if_none:'' }}&to_date={{ to_date|default_if_none:'' }}&client={{ selected_client|default_if_none:'' }}" class="action-link">
+                        <i class="fas fa-file-alt"></i>
+                        {% trans "Generate Report" %}
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Purchases Metrics -->
+            <div class="metric-card purchases">
+                <div class="metric-header">
+                    <h3>{% trans "Purchases" %}</h3>
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="metric-body">
+                    <div class="metric-value">
+                        <span class="amount">{{ total_purchases|floatformat:2|intcomma }}</span>
+                        <span class="currency">{% trans "EGP" %}</span>
+                    </div>
+                    <div class="metric-details">
+                        <div class="detail-item">
+                            <span class="label">{% trans "Last 30 Days" %}</span>
+                            <span class="value">{{ recent_purchases|floatformat:2|intcomma }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">{% trans "Unpaid" %}</span>
+                            <span class="value">{{ unpaid_purchases|floatformat:2|intcomma }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-footer">
+                    <a href="{% url 'admin:accounting_purchases_report' %}?from_date={{ from_date|default_if_none:'' }}&to_date={{ to_date|default_if_none:'' }}&supplier={{ selected_supplier|default_if_none:'' }}" class="action-link">
+                        <i class="fas fa-file-alt"></i>
+                        {% trans "Generate Report" %}
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Inventory Metrics -->
+            <div class="metric-card inventory">
+                <div class="metric-header">
+                    <h3>{% trans "Inventory" %}</h3>
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="metric-body">
+                    <div class="metric-value">
+                        <span class="amount">{{ low_stock_products }}</span>
+                        <span class="unit">{% trans "Items" %}</span>
+                    </div>
+                    <div class="metric-details">
+                        <div class="detail-item">
+                            <span class="label">{% trans "Low Stock" %}</span>
+                            <span class="value">{{ low_stock_products }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">{% trans "Out of Stock" %}</span>
+                            <span class="value">{{ out_of_stock_products }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-footer">
+                    <a href="{% url 'admin:accounting_product_changelist' %}?quantity_in_stock__lte=F('reorder_level')" class="action-link">
+                        <i class="fas fa-list"></i>
+                        {% trans "View Inventory" %}
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Clients & Suppliers Metrics -->
+            <div class="metric-card clients">
+                <div class="metric-header">
+                    <h3>{% trans "Clients & Suppliers" %}</h3>
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="metric-body">
+                    <div class="metric-value">
+                        <span class="amount">{{ total_clients }}</span>
+                        <span class="unit">{% trans "Clients" %}</span>
+                    </div>
+                    <div class="metric-details">
+                        <div class="detail-item">
+                            <span class="label">{% trans "Active Clients" %}</span>
+                            <span class="value">{{ active_clients }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">{% trans "Active Suppliers" %}</span>
+                            <span class="value">{{ active_suppliers }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-footer">
+                    <a href="{% url 'admin:accounting_client_changelist' %}" class="action-link">
+                        <i class="fas fa-list"></i>
+                        {% trans "View Contacts" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Visualization Section -->
+    <section class="visualization-section">
+        <div class="chart-container">
+            <div class="chart-header">
+                <h2 class="section-title">
+                    <span class="title-text">{% trans "Sales & Purchases Trend" %}</span>
+                    <i class="fas fa-chart-line"></i>
+                </h2>
+                <div class="chart-actions">
+                    <button class="chart-action-btn active" data-period="monthly">
+                        {% trans "Monthly" %}
+                    </button>
+                    <button class="chart-action-btn" data-period="quarterly">
+                        {% trans "Quarterly" %}
+                    </button>
+                    <button class="chart-action-btn" data-period="yearly">
+                        {% trans "Yearly" %}
+                    </button>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Activity Section -->
+    <section class="activity-section">
+        <!-- Add a section title for Recent Activity -->
+        <h2 class="section-title">
+            <span class="title-text">{% trans "Recent Activity" %}</span>
+            <i class="fas fa-history"></i>
+        </h2>
+        <div class="activity-tabs">
+            <button class="activity-tab active" data-target="invoices">
+                <i class="fas fa-file-invoice"></i>
+                <span>{% trans "Recent Invoices" %}</span>
+            </button>
+            <button class="activity-tab" data-target="payments">
+                <i class="fas fa-credit-card"></i>
+                <span>{% trans "Recent Payments" %}</span>
+            </button>
+            <button class="activity-tab" data-target="orders">
+                <i class="fas fa-clipboard-list"></i>
+                <span>{% trans "Recent Orders" %}</span>
+            </button>
+        </div>
+        
+        <!-- Invoices Tab -->
+        <div class="activity-content active" id="invoices">
+            <div class="table-responsive">
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>{% trans "Invoice #" %}</th>
+                            <th>{% trans "Date" %}</th>
+                            <th>{% trans "Type" %}</th>
+                            <th>{% trans "Client/Supplier" %}</th>
+                            <th>{% trans "Amount" %}</th>
+                            <th>{% trans "Status" %}</th>
+                            <th>{% trans "Actions" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in recent_invoices %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'admin:accounting_invoice_change' invoice.id %}" class="invoice-link">
+                                    {{ invoice.invoice_number }}
+                                </a>
+                            </td>
+                            <td>{{ invoice.invoice_date|date:"Y-m-d" }}</td>
+                            <td>
+                                <span class="badge {{ invoice.invoice_type }}">
+                                    {{ invoice.get_invoice_type_display }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if invoice.invoice_type == 'sale' %}
+                                    {{ invoice.client.name|default:"N/A" }}
+                                {% else %}
+                                    {{ invoice.supplier.name|default:"N/A" }}
+                                {% endif %}
+                            </td>
+                            <td>{{ invoice.total_amount|floatformat:2 }}</td>
+                            <td>
+                                <span class="status-badge {{ invoice.payment_status }}">
+                                    {{ invoice.get_payment_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{% url 'admin:accounting_invoice_change' invoice.id %}" class="action-btn view" title="{% trans 'View' %}">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="#" class="action-btn print" title="{% trans 'Print' %}">
+                                        <i class="fas fa-print"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="no-data">
+                                {% trans "No recent invoices found." %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-footer">
+                <a href="{% url 'admin:accounting_invoice_changelist' %}" class="view-all">
+                    {% trans "View All Invoices" %} <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Payments Tab -->
+        <div class="activity-content" id="payments">
+            <div class="table-responsive">
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>{% trans "Payment #" %}</th>
+                            <th>{% trans "Date" %}</th>
+                            <th>{% trans "Invoice #" %}</th>
+                            <th>{% trans "Client" %}</th>
+                            <th>{% trans "Amount" %}</th>
+                            <th>{% trans "Method" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in recent_payments %}
+                        <tr>
+                            <td>{{ payment.id }}</td>
+                            <td>{{ payment.payment_date|date:"Y-m-d" }}</td>
+                            <td>
+                                <a href="{% url 'admin:accounting_invoice_change' payment.invoice.id %}">
+                                    {{ payment.invoice.invoice_number }}
+                                </a>
+                            </td>
+                            <td>{{ payment.invoice.client.name|default:"N/A" }}</td>
+                            <td>{{ payment.amount|floatformat:2 }}</td>
+                            <td>{{ payment.get_payment_method_display }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="no-data">
+                                {% trans "No recent payments found." %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-footer">
+                <a href="{% url 'admin:accounting_payment_changelist' %}" class="view-all">
+                    {% trans "View All Payments" %} <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Orders Tab -->
+        <div class="activity-content" id="orders">
+            <div class="table-responsive">
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>{% trans "Invoice #" %}</th>
+                            <th>{% trans "Date" %}</th>
+                            <th>{% trans "Client" %}</th>
+                            <th>{% trans "Amount" %}</th>
+                            <th>{% trans "Status" %}</th>
+                            <th>{% trans "Actions" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_orders %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'admin:accounting_invoice_change' order.id %}" class="invoice-link">
+                                    {{ order.invoice_number }}
+                                </a>
+                            </td>
+                            <td>{{ order.invoice_date|date:"Y-m-d" }}</td>
+                            <td>{{ order.client.name|default:"N/A" }}</td>
+                            <td>{{ order.total_amount|floatformat:2 }}</td>
+                            <td>
+                                <span class="status-badge {{ order.payment_status }}">
+                                    {{ order.get_payment_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{% url 'admin:accounting_invoice_change' order.id %}" class="action-btn view" title="{% trans 'View' %}">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="no-data">
+                                {% trans "No recent orders found." %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-footer">
+                <a href="{% url 'admin:accounting_invoice_changelist' %}?invoice_type=sale" class="view-all">
+                    {% trans "View All Orders" %} <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Actions Panel -->
+    <section class="quick-actions">
+        <h2 class="section-title">
+            <span class="title-text">{% trans "Quick Actions" %}</span>
+            <i class="fas fa-bolt"></i>
+        </h2>
+        <div class="actions-grid">
+            <a href="{% url 'admin:accounting_invoice_add' %}?invoice_type=sale" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <h3>{% trans "Create Sale" %}</h3>
+                <p>{% trans "Record a new sales invoice" %}</p>
+            </a>
+            
+            <a href="{% url 'admin:accounting_invoice_add' %}?invoice_type=purchase" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <h3>{% trans "Create Purchase" %}</h3>
+                <p>{% trans "Record a new purchase invoice" %}</p>
+            </a>
+            
+            <a href="{% url 'admin:accounting_client_add' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h3>{% trans "Add Client" %}</h3>
+                <p>{% trans "Register a new client" %}</p>
+            </a>
+            
+            <a href="{% url 'admin:accounting_supplier_add' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-industry"></i>
+                </div>
+                <h3>{% trans "Add Supplier" %}</h3>
+                <p>{% trans "Register a new supplier" %}</p>
+            </a>
+            
+            <a href="{% url 'admin:accounting_product_add' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-cube"></i>
+                </div>
+                <h3>{% trans "Add Product" %}</h3>
+                <p>{% trans "Add a new inventory item" %}</p>
+            </a>
+            
+            <a href="{% url 'admin:accounting_payment_add' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <h3>{% trans "Record Payment" %}</h3>
+                <p>{% trans "Record a payment transaction" %}</p>
+            </a>
+        </div>
+    </section>
+</div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Sales Chart
+    const ctx = document.getElementById('salesChart');
+    if (!ctx) {
+        console.error('Canvas element with ID "salesChart" not found.');
+        return;
+    }
+    
+    const chartData = {{ chart_data|safe }};
+    if (!chartData || !chartData.data) {
+        console.error('Invalid or missing chart data.');
+        return;
+    }
+
+    chartData.data.datasets[0].label = "{% trans 'Sales' %}";
+    chartData.data.datasets[0].backgroundColor = 'rgba(54, 162, 235, 0.2)';
+    chartData.data.datasets[0].borderColor = 'rgba(54, 162, 235, 1)';
+    chartData.data.datasets[0].borderWidth = 2;
+    chartData.data.datasets[0].tension = 0.4;
+    
+    chartData.data.datasets[1].label = "{% trans 'Purchases' %}";
+    chartData.data.datasets[1].backgroundColor = 'rgba(255, 99, 132, 0.2)';
+    chartData.data.datasets[1].borderColor = 'rgba(255, 99, 132, 1)';
+    chartData.data.datasets[1].borderWidth = 2;
+    chartData.data.datasets[1].tension = 0.4;
+    
+    chartData.options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    font: {
+                        size: 14
+                    }
+                }
+            },
+            tooltip: {
+                mode: 'index',
+                intersect: false,
+                callbacks: {
+                    label: function(context) {
+                        return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' {% trans "EGP" %}';
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: "{% trans 'Amount (EGP)' %}",
+                    font: {
+                        size: 14,
+                        weight: 'bold'
+                    }
+                },
+                ticks: {
+                    callback: function(value) {
+                        return value.toLocaleString();
+                    }
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: "{% trans 'Month' %}",
+                    font: {
+                        size: 14,
+                        weight: 'bold'
+                    }
+                }
+            }
+        },
+        animation: {
+            duration: 1000,
+            easing: 'easeInOutQuad'
+        }
+    };
+    
+    let salesChart;
+    try {
+        salesChart = new Chart(ctx.getContext('2d'), chartData);
+    } catch (error) {
+        console.error('Error initializing chart:', error);
+    }
+    
+    // Filter panel toggle
+    const filterToggle = document.querySelector('.filter-toggle');
+    const filterContent = document.querySelector('.filter-content');
+    
+    if (filterToggle && filterContent) {
+        filterToggle.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+            filterContent.style.display = isExpanded ? 'none' : 'block';
+            const icon = this.querySelector('i');
+            icon.className = isExpanded ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+        });
+    } else {
+        console.warn('Filter toggle or content not found.');
+    }
+    
+    // Activity tabs
+    const activityTabs = document.querySelectorAll('.activity-tab');
+    const activityContents = document.querySelectorAll('.activity-content');
+    
+    activityTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const targetContent = document.getElementById(targetId);
+            
+            if (!targetContent) {
+                console.warn(`Activity content with ID "${targetId}" not found.`);
+                return;
+            }
+            
+            activityTabs.forEach(t => t.classList.remove('active'));
+            activityContents.forEach(c => c.classList.remove('active'));
+            
+            this.classList.add('active');
+            targetContent.classList.add('active');
+        });
+    });
+    
+    // Chart period buttons
+    const chartPeriodBtns = document.querySelectorAll('.chart-action-btn');
+    
+    chartPeriodBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const period = this.getAttribute('data-period');
+            
+            chartPeriodBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            fetchChartData(period);
+        });
+    });
+
+    function fetchChartData(period) {
+        const fromDateInput = document.getElementById('from_date');
+        const toDateInput = document.getElementById('to_date');
+        const clientInput = document.getElementById('client');
+        const supplierInput = document.getElementById('supplier');
+        
+        if (!fromDateInput || !toDateInput || !clientInput || !supplierInput) {
+            console.error('One or more filter inputs not found.');
+            return;
+        }
+        
+        const fromDate = fromDateInput.value;
+        const toDate = toDateInput.value;
+        const clientId = clientInput.value;
+        const supplierId = supplierInput.value;
+        
+        const url = new URL('{% url "admin:accounting_chart_data" %}');
+        url.searchParams.append('from_date', fromDate);
+        url.searchParams.append('to_date', toDate);
+        url.searchParams.append('client', clientId);
+        url.searchParams.append('supplier', supplierId);
+        url.searchParams.append('period', period);
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data.chart_data || !data.chart_data.data) {
+                    throw new Error('Invalid chart data received.');
+                }
+                if (salesChart) {
+                    salesChart.data.labels = data.chart_data.data.labels;
+                    salesChart.data.datasets[0].data = data.chart_data.data.datasets[0].data;
+                    salesChart.data.datasets[1].data = data.chart_data.data.datasets[1].data;
+                    salesChart.update();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching chart data:', error);
+                alert('{% trans "Failed to update chart. Please try again." %}');
+            });
+    }
+});
+</script>
+
+<!-- Dashboard Styles -->
+<style>
+/* Base Styles */
+:root {
+    --primary-color: #4361ee;
+    --primary-light: #e6e9ff;
+    --secondary-color: #3f37c9;
+    --success-color: #4cc9f0;
+    --warning-color: #f8961e;
+    --danger-color: #f72585;
+    --info-color: #4895ef;
+    --dark-color: #2b2d42;
+    --light-color: #f8f9fa;
+    --gray-color: #6c757d;
+    --light-gray: #e9ecef;
+    --white: #ffffff;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --transition: all 0.3s ease;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Noto Sans Arabic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--dark-color);
+    background-color: #f5f7fa;
+}
+
+[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+}
+
+/* Icons (using Font Awesome) */
+i.fas, i.far {
+    font-family: 'Font Awesome 6 Free' !important;
+    font-weight: 900;
+}
+
+.fas.fa-tachometer-alt {
+    font-size: 1.4rem;
+    color: var(--white);
+}
+
+.fas.fa-bell, .fas.fa-filter, .fas.fa-chart-bar, .fas.fa-chart-line, .fas.fa-bolt, .fas.fa-history {
+    font-size: 1.2rem;
+    color: var(--dark-color);
+}
+
+.fas.fa-chevron-down, .fas.fa-chevron-up {
+    font-size: 1.2rem;
+    color: var(--gray-color);
+}
+
+.fas.fa-exclamation-triangle {
+    font-size: 1.2rem;
+    color: var(--warning-color);
+}
+
+.fas.fa-check-circle {
+    font-size: 1.2rem;
+    color: var(--info-color);
+}
+
+.fas.fa-search, .fas.fa-times, .fas.fa-dollar-sign, 
+.fas.fa-shopping-cart, .fas.fa-box, .fas.fa-users, .fas.fa-file-alt, 
+.fas.fa-list, .fas.fa-file-invoice, .fas.fa-credit-card, 
+.fas.fa-clipboard-list, .fas.fa-eye, .fas.fa-print, .fas.fa-arrow-right, 
+.fas.fa-shopping-bag, .fas.fa-box-open, .fas.fa-user-plus, 
+.fas.fa-industry, .fas.fa-cube {
+    font-size: 1.2rem;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    max-width: 1800px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    grid-gap: 24px;
+}
+
+/* Header Styles */
+.dashboard-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--white);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 10px;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+[dir="ltr"] .header-content {
+    justify-content: space-between;
+}
+
+[dir="rtl"] .header-content {
+    justify-content: flex-end;
+    flex-direction: row-reverse;
+}
+
+.dashboard-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+[dir="ltr"] .dashboard-title {
+    flex-direction: row;
+}
+
+[dir="rtl"] .dashboard-title {
+    flex-direction: row-reverse;
+    text-align: right;
+    justify-content: flex-end;
+}
+
+.dashboard-title span {
+    display: inline-block;
+}
+
+.language-switcher {
+    position: relative;
+}
+
+.language-select {
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.language-select:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.language-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* Section Titles */
+.section-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.section-title .title-text {
+    flex-grow: 1;
+}
+
+[dir="ltr"] .section-title {
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+[dir="rtl"] .section-title {
+    flex-direction: row;
+    justify-content: flex-end;
+    text-align: right;
+}
+
+/* Ensure chart-header containing section-title aligns correctly */
+.chart-header .section-title {
+    flex-grow: 1;
+}
+
+/* Notification Center */
+.notification-center {
+    margin-bottom: 20px;
+}
+
+.notifications-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+.notification-card {
+    padding: 16px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: var(--transition);
+}
+
+[dir="rtl"] .notification-card {
+    flex-direction: row-reverse;
+}
+
+.notification-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.notification-card.alert {
+    background-color: rgba(248, 150, 30, 0.1);
+    border-left: 4px solid var(--warning-color);
+}
+
+[dir="rtl"] .notification-card.alert {
+    border-left: none;
+    border-right: 4px solid var(--warning-color);
+}
+
+.notification-card.info {
+    background-color: rgba(72, 149, 239, 0.1);
+    border-left: 4px solid var(--info-color);
+}
+
+[dir="rtl"] .notification-card.info {
+    border-left: none;
+    border-right: 4px solid var(--info-color);
+}
+
+.notification-icon {
+    padding: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-content h3 {
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+    color: var(--dark-color);
+}
+
+.notification-content p {
+    font-size: 0.9rem;
+    color: var(--gray-color);
+    margin-bottom: 0;
+}
+
+.notification-content a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.notification-content a:hover {
+    text-decoration: underline;
+}
+
+.notification-time {
+    font-size: 0.8rem;
+    color: var(--gray-color);
+    white-space: nowrap;
+}
+
+/* Filter Panel */
+.filter-panel {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    cursor: pointer;
+    background-color: var(--light-color);
+}
+
+[dir="ltr"] .filter-header {
+    flex-direction: row;
+}
+
+[dir="rtl"] .filter-header {
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.filter-header .section-title {
+    flex-grow: 1;
+}
+
+.filter-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    transition: var(--transition);
+}
+
+.filter-toggle:hover {
+    color: var(--dark-color);
+}
+
+.filter-content {
+    padding: 20px;
+    display: block;
+}
+
+.filter-form {
+    width: 100%;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+.filter-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--light-gray);
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+}
+
+.date-range {
+    display: flex;
+    flex-direction: column;
+}
+
+.date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+[dir="rtl"] .date-inputs {
+    flex-direction: row-reverse;
+}
+
+.date-separator {
+    color: var(--gray-color);
+    font-size: 0.9rem;
+}
+
+.form-group.actions {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+[dir="rtl"] .form-group.actions {
+    flex-direction: row-reverse;
+}
+
+.filter-button {
+    padding: 10px 16px;
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+[dir="rtl"] .filter-button {
+    flex-direction: row-reverse;
+}
+
+.filter-button.primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+}
+
+.filter-button.primary:hover {
+    background-color: var(--secondary-color);
+}
+
+.filter-button.secondary {
+    background-color: var(--white);
+    color: var(--gray-color);
+    border: 1px solid var(--light-gray);
+}
+
+.filter-button.secondary:hover {
+    background-color: var(--light-color);
+    color: var(--dark-color);
+}
+
+/* Metrics Section */
+.metrics-section {
+    margin-bottom: 20px;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.metric-card {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.metric-header {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--light-color);
+}
+
+[dir="rtl"] .metric-header {
+    flex-direction: row-reverse;
+}
+
+.metric-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--dark-color);
+}
+
+.metric-header i {
+    font-size: 1.5rem;
+    opacity: 0.8;
+}
+
+.metric-card.sales .metric-header {
+    border-bottom: 3px solid var(--primary-color);
+}
+
+.metric-card.purchases .metric-header {
+    border-bottom: 3px solid var(--info-color);
+}
+
+.metric-card.inventory .metric-header {
+    border-bottom: 3px solid var(--warning-color);
+}
+
+.metric-card.clients .metric-header {
+    border-bottom: 3px solid var(--success-color);
+}
+
+.metric-body {
+    padding: 20px;
+}
+
+.metric-value {
+    margin-bottom: 16px;
+}
+
+.metric-value .amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+.metric-value .currency,
+.metric-value .unit {
+    font-size: 1rem;
+    color: var(--gray-color);
+    margin-left: 5px;
+}
+
+[dir="rtl"] .metric-value .currency,
+[dir="rtl"] .metric-value .unit {
+    margin-left: 0;
+    margin-right: 5px;
+}
+
+.metric-details {
+    display: grid;
+    gap: 12px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+}
+
+[dir="rtl"] .detail-item {
+    flex-direction: row-reverse;
+}
+
+.detail-item .label {
+    color: var(--gray-color);
+    font-size: 0.9rem;
+}
+
+.detail-item .value {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.metric-footer {
+    padding: 12px 20px;
+    background-color: var(--light-color);
+    border-top: 1px solid var(--light-gray);
+}
+
+.action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+[dir="rtl"] .action-link {
+    flex-direction: row-reverse;
+}
+
+.action-link:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+/* Visualization Section */
+.visualization-section {
+    margin-bottom: 20px;
+}
+
+.chart-container {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+[dir="ltr"] .chart-header {
+    flex-direction: row;
+}
+
+[dir="rtl"] .chart-header {
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.chart-actions {
+    display: flex;
+    gap: 8px;
+}
+
+[dir="rtl"] .chart-actions {
+    flex-direction: row-reverse;
+}
+
+.chart-action-btn {
+    padding: 6px 12px;
+    background-color: var(--light-color);
+    border: 1px solid var(--light-gray);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--gray-color);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.chart-action-btn:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+}
+
+.chart-action-btn.active {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border-color: var(--primary-color);
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 400px;
+    width: 100%;
+}
+
+/* Activity Section */
+.activity-section {
+    margin-bottom: 20px;
+}
+
+.activity-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--light-gray);
+    margin-bottom: 20px;
+}
+
+[dir="rtl"] .activity-tabs {
+    flex-direction: row-reverse;
+}
+
+.activity-tab {
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--gray-color);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+[dir="ltr"] .activity-tab {
+    flex-direction: row;
+}
+
+[dir="rtl"] .activity-tab {
+    flex-direction: row;
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.activity-tab:hover {
+    color: var(--primary-color);
+}
+
+.activity-tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.activity-content {
+    display: none;
+}
+
+.activity-content.active {
+    display: block;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.activity-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    background-color: var(--white);
+    box-shadow: var(--box-shadow);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.activity-table th,
+.activity-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+[dir="rtl"] .activity-table th,
+[dir="rtl"] .activity-table td {
+    text-align: right;
+}
+
+.activity-table th {
+    background-color: var(--light-color);
+    font-weight: 600;
+    color: var(--dark-color);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.activity-table tbody tr:hover {
+    background-color: rgba(67, 97, 238, 0.05);
+}
+
+.invoice-link {
+    color: var(--primary-color);
+    font-weight: 500;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.invoice-link:hover {
+    text-decoration: underline;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge.sale {
+    background-color: rgba(67, 97, 238, 0.1);
+    color: var(--primary-color);
+}
+
+.badge.purchase {
+    background-color: rgba(248, 150, 30, 0.1);
+    color: var(--warning-color);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-badge.paid {
+    background-color: rgba(76, 201, 240, 0.1);
+    color: var(--success-color);
+}
+
+.status-badge.pending {
+    background-color: rgba(248, 150, 30, 0.1);
+    color: var(--warning-color);
+}
+
+.status-badge.unpaid {
+    background-color: rgba(247, 37, 133, 0.1);
+    color: var(--danger-color);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+[dir="rtl"] .action-buttons {
+    flex-direction: row-reverse;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: var(--light-color);
+    color: var(--gray-color);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.action-btn:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+}
+
+.action-btn.print:hover {
+    background-color: rgba(248, 150, 30, 0.1);
+    color: var(--warning-color);
+}
+
+.no-data {
+    text-align: center;
+    padding: 40px;
+    color: var(--gray-color);
+    font-style: italic;
+}
+
+.table-footer {
+    margin-top: 15px;
+    text-align: right;
+}
+
+[dir="rtl"] .table-footer {
+    text-align: left;
+}
+
+.view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+[dir="rtl"] .view-all {
+    flex-direction: row-reverse;
+}
+
+.view-all:hover {
+    text-decoration: underline;
+}
+
+/* Quick Actions Section */
+.quick-actions {
+    margin-bottom: 20px;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.action-card {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+    text-align: center;
+    transition: var(--transition);
+    text-decoration: none;
+    color: var(--dark-color);
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+}
+
+.action-icon {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 15px;
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: var(--transition);
+}
+
+.action-card:hover .action-icon {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.action-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.action-card p {
+    font-size: 0.85rem;
+    color: var(--gray-color);
+    margin-bottom: 0;
+    transition: var(--transition);
+}
+
+.action-card:hover p {
+    color: var(--primary-color);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 15px;
+        grid-gap: 15px;
+    }
+
+    .dashboard-title {
+        font-size: 1.5rem;
+    }
+
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    [dir="rtl"] .header-content {
+        align-items: flex-end;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+
+    .language-select {
+        width: 100%;
+    }
+
+    .notifications-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .form-group {
+        min-width: 100%;
+    }
+
+    .date-inputs {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    [dir="rtl"] .date-inputs {
+        align-items: flex-end;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    [dir="rtl"] .chart-header {
+        align-items: flex-end;
+    }
+
+    .chart-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .chart-action-btn {
+        flex: 1;
+        text-align: center;
+    }
+
+    .activity-tabs {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .activity-tab {
+        padding: 12px;
+        border: none;
+        border-left: 3px solid transparent;
+    }
+
+    [dir="rtl"] .activity-tab {
+        border-left: none;
+        border-right: 3px solid transparent;
+    }
+
+    .activity-tab.active {
+        border-bottom: none;
+        border-left-color: var(--primary-color);
+    }
+
+    [dir="rtl"] .activity-tab.active {
+        border-left: none;
+        border-right-color: var(--primary-color);
+    }
+
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-title {
+        font-size: 1.3rem;
+    }
+
+    .section-title {
+        font-size: 1.2rem;
+    }
+
+    .metric-value .amount {
+        font-size: 1.8rem;
+    }
+
+    .activity-table {
+        font-size: 0.85rem;
+    }
+
+    .activity-table th,
+    .activity-table td {
+        padding: 8px 10px;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+    }
+
+    .chart-wrapper {
+        height: 300px;
+    }
+}
+</style>
+</body>
+</html>
