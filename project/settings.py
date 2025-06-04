@@ -6,11 +6,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = os.getenv("SECRET_KEY")
+#SECRET_KEY = os.getenv("SECRET_KEY")
 
-#SECRET_KEY = 'django-insecure-j-h3pvnm5j&up_tx5912#)k%y!e86=mo7=ml%k6((7lmx=s-j2'
+SECRET_KEY = 'django-insecure-j-h3pvnm5j&up_tx5912#)k%y!e86=mo7=ml%k6((7lmx=s-j2'
 #DEBUG = True
-DEBUG = os.getenv("DEBUG")
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
@@ -73,23 +73,17 @@ ADMIN_SITE_HEADER = "Accounting System Administration"
 ASGI_APPLICATION = "project.asgi.application"
 WSGI_APPLICATION = "project.wsgi.application"
 
-if DEBUG:
-    # DATABASES = {
-    #     "default": {
-    #         "ENGINE": "django.db.backends.sqlite3",
-    #         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-    #     }
-    # }
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": "railway",  # Replace with your actual DB name
-            "USER": "postgres",  # Replace with your actual DB user
-            "PASSWORD": "yGIwdmOJPOKMYkVXByIeegbpnROKKDaW",  # Replace with your actual DB password
-            "HOST": "postgres.railway.internal",  # Use Railway's host
-            "PORT": "5432",  # PostgreSQL default port
-        }
+
+DATABASES = {
+    "default": {
+    "ENGINE": "django.db.backends.postgresql",
+    "NAME": "railway",  # Replace with your actual DB name
+    "USER": "postgres",  # Replace with your actual DB user
+    "PASSWORD": "yGIwdmOJPOKMYkVXByIeegbpnROKKDaW",  # Replace with your actual DB password
+    "HOST": "postgres.railway.internal",  # Use Railway's host
+    "PORT": "5432",  # PostgreSQL default port
     }
+}
     
     
 
