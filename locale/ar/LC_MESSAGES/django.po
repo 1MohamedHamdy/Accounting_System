@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-04 07:44+0000\n"
+"POT-Creation-Date: 2025-06-04 13:59+0300\n"
 "PO-Revision-Date: 2025-05-28 13:40+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Arabic <ar@li.org>\n"
@@ -520,7 +520,7 @@ msgstr "إدارة Django"
 msgid "Home"
 msgstr "الرئيسية"
 
-#: templates/admin/dashboard.html:8
+#: templates/admin/dashboard.html:8 templates/admin/login.html:7
 msgid "Dashboard"
 msgstr "نظرة عامة على لوحة التحكم"
 
@@ -537,6 +537,7 @@ msgid "Low Stock Alert"
 msgstr "تنبيه انخفاض المخزون"
 
 #: templates/admin/dashboard.html:56
+#, python-format
 msgid ""
 "\n"
 "                                Product <a "
@@ -778,7 +779,43 @@ msgstr "الشهر"
 
 #: templates/admin/dashboard.html:730
 msgid "Failed to update chart. Please try again."
-msgstr ""
+msgstr "فشل في تحديث المخطط. الرجاء المحاولة مرة أخرى"
+
+#: templates/admin/login.html:7 templates/admin/login.html:331
+msgid "Login"
+msgstr "تسجيل الدخول"
+
+#: templates/admin/login.html:268
+msgid "Dashboard Login"
+msgstr "تسجيل الدخول إلى لوحة التحكم"
+
+#: templates/admin/login.html:270
+msgid "Access your account to manage your business"
+msgstr "قم بالوصول إلى حسابك لإدارة أعمالك"
+
+#: templates/admin/login.html:279
+msgid "Please correct the errors below."
+msgstr "يرجى تصحيح الأخطاء أدناه."
+
+#: templates/admin/login.html:293
+msgid "Username"
+msgstr "اسم المستخدم"
+
+#: templates/admin/login.html:295
+msgid "Enter your username"
+msgstr "ادخل اسم المستخدم"
+
+#: templates/admin/login.html:307
+msgid "Password"
+msgstr "كلمة المرور"
+
+#: templates/admin/login.html:309
+msgid "Enter your password"
+msgstr "ادخل كلمة المرور"
+
+#: templates/admin/login.html:323
+msgid "Remember me"
+msgstr "تذكرني"
 
 #~ msgid "USD"
 #~ msgstr "دولار أمريكي"

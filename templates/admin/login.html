@@ -1,0 +1,391 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_CODE == 'ar' %}dir="rtl"{% else %}dir="ltr"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Login" %} | {% trans "Dashboard" %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+    :root {
+        --primary-color: #4361ee;
+        --primary-light: #e6e9ff;
+        --secondary-color: #3f37c9;
+        --success-color: #4cc9f0;
+        --warning-color: #f8961e;
+        --danger-color: #f72585;
+        --info-color: #4895ef;
+        --dark-color: #2b2d42;
+        --light-color: #f8f9fa;
+        --gray-color: #6c757d;
+        --light-gray: #e9ecef;
+        --white: #ffffff;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Noto Sans Arabic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: var(--dark-color);
+        background-color: #f5f7fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        background-image: linear-gradient(135deg, rgba(67, 97, 238, 0.1) 0%, rgba(63, 55, 201, 0.1) 100%);
+    }
+
+    .login-container {
+        width: 100%;
+        max-width: 420px;
+        background-color: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .login-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: var(--white);
+        padding: 30px;
+        text-align: center;
+        position: relative;
+    }
+
+    .login-header h1 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .login-header p {
+        font-size: 0.95rem;
+        opacity: 0.9;
+    }
+
+    .login-header .logo {
+        font-size: 2.5rem;
+        color: var(--white);
+    }
+
+    .login-body {
+        padding: 30px;
+    }
+
+    .login-form .form-group {
+        margin-bottom: 20px;
+    }
+
+    .login-form label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--dark-color);
+    }
+
+    .input-group {
+        position: relative;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 12px 16px 12px 45px;
+        border: 1px solid var(--light-gray);
+        border-radius: var(--border-radius);
+        font-size: 0.95rem;
+        transition: var(--transition);
+    }
+
+    [dir="rtl"] .input-group input {
+        padding: 12px 45px 12px 16px;
+    }
+
+    .input-group input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+
+    .input-group .icon {
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        transform: translateY(-50%);
+        color: var(--gray-color);
+        font-size: 1.1rem;
+    }
+
+    [dir="rtl"] .input-group .icon {
+        left: auto;
+        right: 15px;
+    }
+
+    .remember-forgot {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    [dir="rtl"] .remember-forgot {
+        flex-direction: row-reverse;
+    }
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .remember-me input {
+        width: 16px;
+        height: 16px;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: var(--primary-color);
+        color: var(--white);
+        border: none;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .login-btn:hover {
+        background-color: var(--secondary-color);
+    }
+
+    .login-footer {
+        margin-top: 25px;
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--gray-color);
+    }
+
+    .login-footer a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+
+    .login-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .language-switcher {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .language-select {
+        padding: 8px 12px;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--light-gray);
+        background-color: var(--white);
+        color: var(--dark-color);
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .language-select:hover {
+        border-color: var(--primary-color);
+    }
+
+    .language-select:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+
+    .error-message {
+        color: var(--danger-color);
+        font-size: 0.9rem;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+        .login-header {
+            padding: 25px 20px;
+        }
+        
+        .login-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .login-body {
+            padding: 25px 20px;
+        }
+        
+        .remember-forgot {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        [dir="rtl"] .remember-forgot {
+            align-items: flex-end;
+        }
+    }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <div class="login-header">
+        <h1>
+            <i class="fas fa-tachometer-alt logo"></i>
+            <span>{% trans "Dashboard Login" %}</span>
+        </h1>
+        <p>{% trans "Access your account to manage your business" %}</p>
+    </div>
+    
+    <div class="login-body">
+        <form method="post" action="{% url 'admin:login' %}" class="login-form">
+            {% csrf_token %}
+            {% if form.errors and not form.non_field_errors %}
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {% trans "Please correct the errors below." %}
+                </div>
+            {% endif %}
+            
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="form-group">
+                <label for="id_username">{% trans "Username" %}</label>
+                <div class="input-group">
+                    <input type="text" name="username" id="id_username" placeholder="{% trans 'Enter your username' %}" required>
+                    <i class="fas fa-user icon"></i>
+                </div>
+                {% if form.username.errors %}
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.username.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password">{% trans "Password" %}</label>
+                <div class="input-group">
+                    <input type="password" name="password" id="id_password" placeholder="{% trans 'Enter your password' %}" required>
+                    <i class="fas fa-lock icon"></i>
+                </div>
+                {% if form.password.errors %}
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.password.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="remember-forgot">
+                <div class="remember-me">
+                    <input type="checkbox" name="remember" id="remember">
+                    <label for="remember">{% trans "Remember me" %}</label>
+                </div>
+            </div>
+            
+            <input type="hidden" name="next" value="{{ next }}">
+            
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>{% trans "Login" %}</span>
+            </button>
+        </form>
+        
+        <div class="language-switcher">
+            <form action="{% url 'set_language' %}" method="post">
+                {% csrf_token %}
+                <select name="language" onchange="this.form.submit()" class="language-select">
+                    {% get_current_language as LANGUAGE_CODE %}
+                    {% get_available_languages as LANGUAGES %}
+                    {% for lang in LANGUAGES %}
+                        <option value="{{ lang.0 }}" {% if lang.0 == LANGUAGE_CODE %}selected{% endif %}>
+                            {{ lang.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add animation to form elements
+    const formGroups = document.querySelectorAll('.form-group');
+    formGroups.forEach((group, index) => {
+        group.style.animationDelay = `${index * 0.1}s`;
+        group.style.animation = 'fadeIn 0.5s ease forwards';
+        group.style.opacity = '0';
+    });
+    
+    // Focus on username field by default
+    const usernameField = document.getElementById('id_username');
+    if (usernameField) {
+        usernameField.focus();
+    }
+    
+    // Add ripple effect to login button
+    const loginBtn = document.querySelector('.login-btn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', function(e) {
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    }
+});
+</script>
+</body>
+</html>
