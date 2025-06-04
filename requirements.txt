@@ -7,3 +7,4 @@ Pillow>=10.3.0
 django-import-export
 django-admin-rangefilter
 qrcode
+openpyxl
