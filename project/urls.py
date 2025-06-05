@@ -25,6 +25,7 @@ urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')),  # Language switcher
 ] + i18n_patterns(
     path('admin/', custom_admin_site.urls),
+    path('accounting/', include('accounting.urls', namespace='accounting')),
     prefix_default_language=True
 
 )

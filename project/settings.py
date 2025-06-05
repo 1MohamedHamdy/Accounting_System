@@ -74,22 +74,24 @@ ASGI_APPLICATION = "project.asgi.application"
 WSGI_APPLICATION = "project.wsgi.application"
 
 
-# DATABASES = {
-#         "default": {
-#             "ENGINE": "django.db.backends.sqlite3",
-#             "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-#         }
-#     }
 DATABASES = {
-    "default": {
-    "ENGINE": "django.db.backends.postgresql",
-    "NAME": "railway",  # Replace with your actual DB name
-    "USER": "postgres",  # Replace with your actual DB user
-    "PASSWORD": "yGIwdmOJPOKMYkVXByIeegbpnROKKDaW",  # Replace with your actual DB password
-    "HOST": "postgres.railway.internal",  # Use Railway's host
-    "PORT": "5432",  # PostgreSQL default port
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
     }
-}
+
+
+# DATABASES = {
+#     "default": {
+#     "ENGINE": "django.db.backends.postgresql",
+#     "NAME": "railway",  # Replace with your actual DB name
+#     "USER": "postgres",  # Replace with your actual DB user
+#     "PASSWORD": "yGIwdmOJPOKMYkVXByIeegbpnROKKDaW",  # Replace with your actual DB password
+#     "HOST": "postgres.railway.internal",  # Use Railway's host
+#     "PORT": "5432",  # PostgreSQL default port
+#     }
+# }
     
     
 
@@ -140,16 +142,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 #     }
 # }
 
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20
-}
+# REST_FRAMEWORK = {
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.IsAuthenticated',
+#     ],
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework_simplejwt.authentication.JWTAuthentication',
+#         'rest_framework.authentication.SessionAuthentication',
+#     ],
+#     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+#     'PAGE_SIZE': 20
+# }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

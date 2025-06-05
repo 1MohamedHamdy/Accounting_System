@@ -1,0 +1,433 @@
+{% load static i18n %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_CODE == 'ar' %}dir="rtl"{% else %}dir="ltr"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Add New Client" %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600&family=Segoe+UI:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-light: #e6e9ff;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --dark-color: #2b2d42;
+            --light-color: #f8f9fa;
+            --gray-color: #6c757d;
+            --light-gray: #e9ecef;
+            --white: #ffffff;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --spacing-unit: 16px;
+        }
+
+        body {
+            font-family: {% if LANGUAGE_CODE == 'ar' %}'Noto Sans Arabic', sans-serif{% else %}'Segoe UI', Tahoma, Geneva, Verdana, sans-serif{% endif %};
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: var(--spacing-unit);
+        }
+
+        [dir="rtl"] {
+            direction: rtl;
+            text-align: right;
+        }
+
+        [dir="ltr"] {
+            direction: ltr;
+            text-align: left;
+        }
+
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: var(--spacing-unit);
+            display: flex;
+            align-items: center;
+            gap: calc(var(--spacing-unit) / 2);
+            justify-content: {% if LANGUAGE_CODE == 'ar' %}flex-end{% else %}flex-start{% endif %};
+        }
+
+        [dir="rtl"] .form-header {
+            flex-direction: row-reverse;
+        }
+
+        .form-header i {
+            font-size: 1.5rem;
+        }
+
+        .form-header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+            flex-grow: 1;
+            text-align: {% if LANGUAGE_CODE == 'ar' %}right{% else %}left{% endif %};
+        }
+
+        .form-content {
+            padding: var(--spacing-unit);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-unit);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: calc(var(--spacing-unit) / 2);
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            box-sizing: border-box;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .section-header {
+            background-color: var(--primary-light);
+            color: var(--dark-color);
+            padding: calc(var(--spacing-unit) / 1.5);
+            margin: var(--spacing-unit) 0 calc(var(--spacing-unit) / 2) 0;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            border-left: {% if LANGUAGE_CODE == 'ar' %}none{% else %}4px solid var(--primary-color){% endif %};
+            border-right: {% if LANGUAGE_CODE == 'ar' %}4px solid var(--primary-color){% else %}none{% endif %};
+        }
+
+        .formset-row {
+            display: flex;
+            gap: var(--spacing-unit);
+            margin-bottom: var(--spacing-unit);
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+
+        [dir="rtl"] .formset-row {
+            flex-direction: row-reverse;
+        }
+
+        .formset-field {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .delete-checkbox {
+            margin-left: {% if LANGUAGE_CODE == 'ar' %}0{% else %}10px{% endif %};
+            margin-right: {% if LANGUAGE_CODE == 'ar' %}10px{% else %}0{% endif %};
+            vertical-align: middle;
+        }
+
+        .add-another {
+            color: var(--success-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            margin-top: calc(var(--spacing-unit) / 2);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .add-another:hover {
+            color: var(--primary-color);
+        }
+
+        .button-group {
+            margin-top: calc(var(--spacing-unit) * 1.5);
+            display: flex;
+            gap: calc(var(--spacing-unit) / 2);
+            justify-content: {% if LANGUAGE_CODE == 'ar' %}flex-start{% else %}flex-end{% endif %};
+        }
+
+        [dir="rtl"] .button-group {
+            flex-direction: row-reverse;
+        }
+
+        .submit-button {
+            padding: 10px 16px;
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        [dir="rtl"] .submit-button {
+            flex-direction: row-reverse;
+        }
+
+        .submit-button.primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+        }
+
+        .submit-button.primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .submit-button.secondary {
+            background-color: var(--white);
+            color: var(--gray-color);
+            border: 1px solid var(--light-gray);
+        }
+
+        .submit-button.secondary:hover {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+
+        .errorlist {
+            color: var(--danger-color);
+            font-size: 0.9rem;
+            margin: 5px 0;
+            list-style: none;
+            padding: 0;
+        }
+
+        .language-switcher {
+            max-width: 800px;
+            margin: 0 auto calc(var(--spacing-unit) / 2) auto;
+            text-align: {% if LANGUAGE_CODE == 'ar' %}left{% else %}right{% endif %};
+        }
+
+        .language-switcher select {
+            padding: 5px 8px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--light-gray);
+            font-family: {% if LANGUAGE_CODE == 'ar' %}'Noto Sans Arabic'{% else %}'Segoe UI'{% endif %}, sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            background-color: var(--white);
+            transition: var(--transition);
+        }
+
+        .language-switcher select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .language-switcher form {
+            display: inline-block;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addButton = document.querySelector('.add-another');
+            const formsetContainer = document.querySelector('.formset-container');
+            const totalForms = document.querySelector('#id_phones-TOTAL_FORMS');
+
+            addButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                const formCount = parseInt(totalForms.value);
+                const newFormIndex = formCount;
+                const newForm = document.querySelector('.formset-row').cloneNode(true);
+                const inputs = newForm.querySelectorAll('input, select, textarea');
+
+                inputs.forEach(input => {
+                    const name = input.name.replace('phones-0-', `phones-${newFormIndex}-`);
+                    const id = input.id.replace('phones-0-', `phones-${newFormIndex}-`);
+                    input.name = name;
+                    input.id = id;
+                    input.value = '';
+                });
+
+                newForm.querySelector('.delete-checkbox').checked = false;
+                formsetContainer.appendChild(newForm);
+                totalForms.value = formCount + 1;
+            });
+
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('delete-checkbox')) {
+                    const row = e.target.closest('.formset-row');
+                    if (e.target.checked) {
+                        row.style.opacity = '0.5';
+                        row.style.pointerEvents = 'none';
+                    } else {
+                        row.style.opacity = '1';
+                        row.style.pointerEvents = 'auto';
+                    }
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="language-switcher">
+        <form action="{% url 'set_language' %}" method="post">
+            {% csrf_token %}
+            <input name="next" type="hidden" value="{{ request.path }}">
+            <select name="language" onchange="this.form.submit()">
+                {% get_current_language as LANGUAGE_CODE %}
+                {% get_available_languages as LANGUAGES %}
+                {% for lang in LANGUAGES %}
+                    <option value="{{ lang.0 }}" {% if lang.0 == LANGUAGE_CODE %}selected{% endif %}>
+                        {{ lang.1 }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <div class="form-container">
+        <div class="form-header">
+            <i class="fas fa-user-plus"></i>
+            <h1>{% trans "Add Client" %}</h1>
+        </div>
+        <div class="form-content">
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Name and Business Type -->
+                <div class="form-group">
+                    <label for="{{ client_form.name.id_for_label }}">{{ client_form.name.label }}</label>
+                    {{ client_form.name }}
+                    {% if client_form.name.errors %}
+                        <ul class="errorlist">
+                            {% for error in client_form.name.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ client_form.business_type.id_for_label }}">{{ client_form.business_type.label }}</label>
+                    {{ client_form.business_type }}
+                    {% if client_form.business_type.errors %}
+                        <ul class="errorlist">
+                            {% for error in client_form.business_type.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!-- Address -->
+                <div class="form-group">
+                    <label for="{{ client_form.address.id_for_label }}">{{ client_form.address.label }}</label>
+                    {{ client_form.address }}
+                    {% if client_form.address.errors %}
+                        <ul class="errorlist">
+                            {% for error in client_form.address.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!-- Identification Section -->
+                <div class="section-header">{% trans "Identification" %}</div>
+                <div class="form-group">
+                    <label for="{{ client_form.national_id.id_for_label }}">{{ client_form.national_id.label }}</label>
+                    {{ client_form.national_id }}
+                    {% if client_form.national_id.errors %}
+                        <ul class="errorlist">
+                            {% for error in client_form.national_id.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ client_form.tax_number.id_for_label }}">{{ client_form.tax_number.label }}</label>
+                    {{ client_form.tax_number }}
+                    {% if client_form.tax_number.errors %}
+                        <ul class="errorlist">
+                            {% for error in client_form.tax_number.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!-- Statistics Section -->
+                <div class="section-header">{% trans "Statistics" %}</div>
+                <div class="form-group">
+                    <label for="{{ client_form.num_of_invoices.id_for_label }}">{{ client_form.num_of_invoices.label }}</label>
+                    {{ client_form.num_of_invoices }}
+                    {% if client_form.num_of_invoices.errors %}
+                        <ul class="errorlist">
+                            {% for error in client_form.num_of_invoices.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!-- Client Phone Numbers Section -->
+                <div class="section-header">{% trans "Client Phone Numbers" %}</div>
+                <div class="formset-container">
+                    {{ phone_formset.management_form }}
+                    {% for form in phone_formset %}
+                        <div class="formset-row">
+                            <div class="formset-field">
+                                <label for="{{ form.number.id_for_label }}">{{ form.number.label }}</label>
+                                {{ form.number }}
+                                {% if form.number.errors %}
+                                    <ul class="errorlist">
+                                        {% for error in form.number.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                            <div class="formset-field">
+                                <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <ul class="errorlist">
+                                        {% for error in form.description.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                            <div class="formset-field">
+                                {{ form.DELETE }} <label for="{{ form.DELETE.id_for_label }}" class="delete-checkbox">{% trans "DELETE?" %}</label>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <a href="#" class="add-another">{% trans "+ Add another Client Phone Number" %}</a>
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button type="submit" name="_save" class="submit-button primary">{% trans "SAVE" %}</button>
+                    <button type="submit" name="_addanother" class="submit-button primary">{% trans "Save and add another" %}</button>
+                    <button type="submit" name="_continue" class="submit-button secondary">{% trans "Save and continue editing" %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

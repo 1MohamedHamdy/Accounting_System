@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-04 13:59+0300\n"
+"POT-Creation-Date: 2025-06-05 08:23+0000\n"
 "PO-Revision-Date: 2025-05-28 13:40+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Arabic <ar@li.org>\n"
@@ -22,7 +22,7 @@ msgstr ""
 msgid "Client Phone Number"
 msgstr "رقم هاتف العميل"
 
-#: accounting/admin.py:36
+#: accounting/admin.py:36 templates/admin/add_client.html:368
 msgid "Client Phone Numbers"
 msgstr "أرقام هواتف العميل"
 
@@ -30,11 +30,11 @@ msgstr "أرقام هواتف العميل"
 msgid "Supplier Phone Number"
 msgstr "رقم هاتف المورد"
 
-#: accounting/admin.py:41
+#: accounting/admin.py:41 templates/admin/add_supplier.html:435
 msgid "Supplier Phone Numbers"
 msgstr "أرقام هواتف المورد"
 
-#: accounting/admin.py:54
+#: accounting/admin.py:54 templates/admin/add_client.html:329
 msgid "Identification"
 msgstr "الهوية"
 
@@ -43,30 +43,33 @@ msgid "National ID for individuals, Tax number for companies"
 msgstr "الهوية الوطنية للأفراد، الرقم الضريبي للشركات"
 
 #: accounting/admin.py:58 accounting/admin.py:80
+#: templates/admin/add_client.html:354 templates/admin/add_supplier.html:421
 msgid "Statistics"
 msgstr "الإحصائيات"
 
-#: accounting/admin.py:74
+#: accounting/admin.py:74 templates/admin/add_supplier.html:356
 msgid "Cooperation"
 msgstr "التعاون"
 
 #: accounting/admin.py:77 accounting/models.py:352
+#: templates/admin/add_supplier.html:396
 msgid "Payment"
 msgstr "الدفع"
 
-#: accounting/admin.py:98
+#: accounting/admin.py:98 templates/admin/add_product.html:268
 msgid "Pricing"
 msgstr "التسعير"
 
-#: accounting/admin.py:101 templates/admin/dashboard.html:207
+#: accounting/admin.py:101 templates/admin/add_product.html:315
+#: templates/admin/dashboard.html:207
 msgid "Inventory"
 msgstr "المخزون"
 
-#: accounting/admin.py:104
+#: accounting/admin.py:104 templates/admin/add_product.html:340
 msgid "Images"
 msgstr "الصور"
 
-#: accounting/admin.py:106
+#: accounting/admin.py:106 templates/admin/add_product.html:341
 msgid "QR code is automatically generated based on product name and code."
 msgstr "يتم إنشاء رمز الاستجابة السريعة تلقائيًا بناءً على اسم المنتج والكود."
 
@@ -78,7 +81,7 @@ msgstr "رمز الاستجابة السريعة لـ"
 msgid "QR Code"
 msgstr "رمز الاستجابة السريعة"
 
-#: accounting/admin.py:125
+#: accounting/admin.py:125 templates/admin/add_product.html:376
 msgid "No QR code available."
 msgstr "لا يوجد رمز استجابة سريعة متاح."
 
@@ -108,7 +111,7 @@ msgid "Products"
 msgstr "المنتجات"
 
 #: accounting/admin.py:145 accounting/models.py:62 accounting/models.py:102
-#: accounting/models.py:141
+#: accounting/models.py:141 templates/admin/view_clients.html:51
 msgid "Name"
 msgstr "الاسم"
 
@@ -147,6 +150,7 @@ msgid "Invoice Item"
 msgstr "عنصر الفاتورة"
 
 #: accounting/admin.py:179 accounting/models.py:307
+#: templates/admin/add_invoice.html:424
 msgid "Invoice Items"
 msgstr "عناصر الفاتورة"
 
@@ -222,17 +226,17 @@ msgstr "تم تسجيل %(count)s فاتورة كغير مدفوعة."
 msgid "Mark selected invoices as unpaid"
 msgstr "تسجيل الفواتير المختارة كغير مدفوعة"
 
-#: accounting/admin.py:262
+#: accounting/admin.py:262 accounting/forms.py:128
 msgid "Remaining Amount"
 msgstr "المبلغ المتبقي"
 
 #: accounting/admin.py:399 templates/admin/dashboard.html:147
-#: templates/admin/dashboard.html:560
+#: templates/admin/dashboard.html:554
 msgid "Sales"
 msgstr "المبيعات"
 
 #: accounting/admin.py:406 templates/admin/dashboard.html:177
-#: templates/admin/dashboard.html:566
+#: templates/admin/dashboard.html:560
 msgid "Purchases"
 msgstr "المشتريات"
 
@@ -261,6 +265,114 @@ msgstr "لوحة تحكم نظام المحاسبة"
 #: accounting/admin.py:580
 msgid "Accounting Dashboard"
 msgstr "لوحة تحكم المحاسبة"
+
+#: accounting/forms.py:11
+msgid "Enter client name"
+msgstr "ادخل اسم المستخدم"
+
+#: accounting/forms.py:13 accounting/forms.py:49
+msgid "Enter address"
+msgstr "العنوان"
+
+#: accounting/forms.py:14
+msgid "Enter national ID"
+msgstr "الهوية الوطنية"
+
+#: accounting/forms.py:15 accounting/forms.py:48
+msgid "Enter tax number"
+msgstr "الرقم الضريبي"
+
+#: accounting/forms.py:16
+msgid "Enter number of invoices"
+msgstr "عدد الفواتير"
+
+#: accounting/forms.py:26 accounting/models.py:71
+msgid "National ID is required for individual clients"
+msgstr "الهوية الوطنية مطلوبة للعملاء الأفراد"
+
+#: accounting/forms.py:28 accounting/models.py:73
+msgid "Tax number is required for company clients"
+msgstr "الرقم الضريبي مطلوب لعملاء الشركات"
+
+#: accounting/forms.py:36 accounting/forms.py:63
+msgid "Enter phone number"
+msgstr "رقم هاتف العميل"
+
+#: accounting/forms.py:37 accounting/forms.py:64
+msgid "e.g., Main contact"
+msgstr "علي سبيل المثال. الرقم الرئيسي"
+
+#: accounting/forms.py:45
+msgid "Enter supplier name"
+msgstr "ادخل اسم المورد"
+
+#: accounting/forms.py:46
+msgid "Enter supplier code"
+msgstr "كود المورد"
+
+#: accounting/forms.py:52
+msgid "Enter website URL"
+msgstr "رابط الموقع الألكتروني"
+
+#: accounting/forms.py:54
+msgid "Enter terms and conditions"
+msgstr "الشروط والأحكام"
+
+#: accounting/forms.py:55
+msgid "Enter total orders"
+msgstr "إجمالي الطلبات"
+
+#: accounting/forms.py:73
+msgid "Enter product name"
+msgstr "ادخل اسم المنتج"
+
+#: accounting/forms.py:74
+msgid "Enter product code"
+msgstr "ادخل كود المنتج"
+
+#: accounting/forms.py:75
+msgid "Enter wholesale price"
+msgstr "سعر الجملة"
+
+#: accounting/forms.py:76
+msgid "Enter retail price"
+msgstr "سعر التجزئة"
+
+#: accounting/forms.py:78
+msgid "Enter tax value"
+msgstr "قيمة الضريبة"
+
+#: accounting/forms.py:79
+msgid "Enter reorder level"
+msgstr "مستوى إعادة الطلب"
+
+#: accounting/forms.py:80
+msgid "Enter quantity in stock"
+msgstr "الكمية في المخزون"
+
+#: accounting/forms.py:82
+msgid "Enter description"
+msgstr "الوصف"
+
+#: accounting/forms.py:92
+msgid "Enter invoice number"
+msgstr "رقم الفاتورة"
+
+#: accounting/forms.py:98 accounting/forms.py:141
+msgid "Enter notes"
+msgstr "ملاحظات"
+
+#: accounting/forms.py:108 accounting/models.py:230
+msgid "Client is required for sales invoices"
+msgstr "العميل مطلوب لفواتير البيع"
+
+#: accounting/forms.py:110 accounting/models.py:232
+msgid "Supplier is required for purchase invoices"
+msgstr "المورد مطلوب لفواتير الشراء"
+
+#: accounting/forms.py:138
+msgid "Enter amount"
+msgstr "عدد العناصر"
 
 #: accounting/models.py:34
 msgid "Created At"
@@ -291,32 +403,27 @@ msgid "Company"
 msgstr "شركة"
 
 #: accounting/models.py:63 accounting/models.py:104
+#: templates/admin/view_clients.html:52
 msgid "Business Type"
 msgstr "نوع العمل"
 
-#: accounting/models.py:64
+#: accounting/models.py:64 templates/admin/view_clients.html:53
 msgid "National ID"
 msgstr "الهوية الوطنية"
 
 #: accounting/models.py:65 accounting/models.py:103
+#: templates/admin/view_clients.html:54
 msgid "Tax Number"
 msgstr "الرقم الضريبي"
 
 #: accounting/models.py:66 accounting/models.py:105
+#: templates/admin/view_clients.html:56
 msgid "Address"
 msgstr "العنوان"
 
-#: accounting/models.py:67
+#: accounting/models.py:67 templates/admin/view_clients.html:55
 msgid "Number of Invoices"
 msgstr "عدد الفواتير"
-
-#: accounting/models.py:71
-msgid "National ID is required for individual clients"
-msgstr "الهوية الوطنية مطلوبة للعملاء الأفراد"
-
-#: accounting/models.py:73
-msgid "Tax number is required for company clients"
-msgstr "الرقم الضريبي مطلوب لعملاء الشركات"
 
 #: accounting/models.py:80 templates/admin/dashboard.html:243
 msgid "Clients"
@@ -393,6 +500,7 @@ msgid "Image"
 msgstr "الصورة"
 
 #: accounting/models.py:194 accounting/models.py:275
+#: templates/admin/add_invoice.html:430
 msgid "Product"
 msgstr "المنتج"
 
@@ -426,16 +534,9 @@ msgid "Invoice Type"
 msgstr "نوع الفاتورة"
 
 #: accounting/models.py:226 accounting/models.py:325
+#: templates/admin/add_payment.html:269
 msgid "Notes"
 msgstr "ملاحظات"
-
-#: accounting/models.py:230
-msgid "Client is required for sales invoices"
-msgstr "العميل مطلوب لفواتير البيع"
-
-#: accounting/models.py:232
-msgid "Supplier is required for purchase invoices"
-msgstr "المورد مطلوب لفواتير الشراء"
 
 #: accounting/models.py:240
 msgid "Could not generate a unique invoice number"
@@ -445,19 +546,19 @@ msgstr "تعذر إنشاء رقم فاتورة فريد"
 msgid "Invoice"
 msgstr "الفاتورة"
 
-#: accounting/models.py:276
+#: accounting/models.py:276 templates/admin/add_invoice.html:441
 msgid "Quantity"
 msgstr "الكمية"
 
-#: accounting/models.py:277
+#: accounting/models.py:277 templates/admin/add_invoice.html:452
 msgid "Price"
 msgstr "السعر"
 
-#: accounting/models.py:278
+#: accounting/models.py:278 templates/admin/add_invoice.html:463
 msgid "Tax Amount"
 msgstr "مبلغ الضريبة"
 
-#: accounting/models.py:279
+#: accounting/models.py:279 templates/admin/add_invoice.html:474
 msgid "Discount"
 msgstr "الخصم"
 
@@ -507,6 +608,156 @@ msgstr "إلى"
 #: templates/admin/custom_date_filter.html:19
 msgid "تطبيق"
 msgstr "تطبيق"
+
+#: accounting/views.py:216
+msgid "Client added successfully!"
+msgstr "تم اضافة العميل بنجاح"
+
+#: accounting/views.py:223
+msgid "Error adding client: "
+msgstr "خطأ اثناء اضافة العميل"
+
+#: accounting/views.py:225 accounting/views.py:263 accounting/views.py:292
+#: accounting/views.py:333 accounting/views.py:363
+#: templates/admin/login.html:279
+msgid "Please correct the errors below."
+msgstr "يرجى تصحيح الأخطاء أدناه."
+
+#: accounting/views.py:254
+msgid "Supplier added successfully!"
+msgstr "تم اضافة المورد بنجاح"
+
+#: accounting/views.py:261
+msgid "Error adding supplier: "
+msgstr "خطأاثناء اضافة المورد"
+
+#: accounting/views.py:283
+msgid "Product added successfully!"
+msgstr "تم اضافة المنتج بنجاخ"
+
+#: accounting/views.py:290
+msgid "Error adding product: "
+msgstr "خطأ اثناء اضافة المنتج"
+
+#: accounting/views.py:324
+msgid "Invoice added successfully!"
+msgstr "تم اضافة الفاتورة بنجاح"
+
+#: accounting/views.py:331
+msgid "Error adding invoice: "
+msgstr "خطأ اثناء اضافة الفاتورة"
+
+#: accounting/views.py:354
+msgid "Payment added successfully!"
+msgstr "تم اضافة الدفع بنجاح"
+
+#: accounting/views.py:361
+msgid "Error adding payment: "
+msgstr "خطأ اثناء اضافة الدفع"
+
+#: templates/admin/add_client.html:8
+msgid "Add New Client"
+msgstr "إضافة عميل"
+
+#: templates/admin/add_client.html:285 templates/admin/dashboard.html:496
+msgid "Add Client"
+msgstr "إضافة عميل"
+
+#: templates/admin/add_client.html:396 templates/admin/add_invoice.html:485
+#: templates/admin/add_supplier.html:474
+msgid "DELETE?"
+msgstr "حذف؟"
+
+#: templates/admin/add_client.html:401
+msgid "+ Add another Client Phone Number"
+msgstr "اضافة رقم هاتف اخر للعميل"
+
+#: templates/admin/add_client.html:405 templates/admin/add_invoice.html:494
+#: templates/admin/add_payment.html:299 templates/admin/add_product.html:383
+#: templates/admin/add_supplier.html:485
+msgid "SAVE"
+msgstr "حفظ"
+
+#: templates/admin/add_client.html:406 templates/admin/add_invoice.html:495
+#: templates/admin/add_payment.html:303 templates/admin/add_product.html:387
+#: templates/admin/add_supplier.html:489
+msgid "Save and add another"
+msgstr "حفظ واضافة اخر"
+
+#: templates/admin/add_client.html:407 templates/admin/add_invoice.html:496
+#: templates/admin/add_payment.html:307 templates/admin/add_product.html:391
+#: templates/admin/add_supplier.html:493
+msgid "Save and continue editing"
+msgstr "حفظ وتعديل"
+
+#: templates/admin/add_invoice.html:8
+msgid "Add New Invoice"
+msgstr "الفاتورة"
+
+#: templates/admin/add_invoice.html:320
+msgid "Add Invoice"
+msgstr "الفاتورة"
+
+#: templates/admin/add_invoice.html:342 templates/admin/add_payment.html:245
+#: templates/admin/add_supplier.html:360 templates/admin/add_supplier.html:372
+msgid "Note: You are 3 hours ahead of server time."
+msgstr "ملاحظة: انت علي بعد 3 ساعات من وقت السيرفر"
+
+#: templates/admin/add_invoice.html:419
+msgid "Total Amount:"
+msgstr "المبلغ الإجمالي"
+
+#: templates/admin/add_invoice.html:490
+msgid "+ Add another Invoice Item"
+msgstr "اضافة عنصر اخر للفاتورة"
+
+#: templates/admin/add_payment.html:8
+msgid "Add New Payment"
+msgstr "الدفع"
+
+#: templates/admin/add_payment.html:210
+msgid "Add Payment"
+msgstr "الدفع"
+
+#: templates/admin/add_product.html:8
+msgid "Add New Product"
+msgstr "إضافة منتج"
+
+#: templates/admin/add_product.html:210 templates/admin/dashboard.html:524
+msgid "Add Product"
+msgstr "إضافة منتج"
+
+#: templates/admin/add_product.html:353 templates/admin/add_product.html:355
+msgid "Image:"
+msgstr "الصورة"
+
+#: templates/admin/add_product.html:355 templates/admin/add_product.html:371
+msgid "Browse..."
+msgstr "تصفح...."
+
+#: templates/admin/add_product.html:355 templates/admin/add_product.html:371
+msgid "No file selected."
+msgstr "لم يتم اختيار ملفات"
+
+#: templates/admin/add_product.html:369 templates/admin/add_product.html:371
+msgid "QR Code:"
+msgstr "رمز الاستجابة السريعة"
+
+#: templates/admin/add_product.html:375
+msgid "QR Code Preview:"
+msgstr "معاينة رمز الاستجابة السريعة"
+
+#: templates/admin/add_supplier.html:8
+msgid "Add New Supplier"
+msgstr "إضافة مورد"
+
+#: templates/admin/add_supplier.html:285 templates/admin/dashboard.html:517
+msgid "Add Supplier"
+msgstr "إضافة مورد"
+
+#: templates/admin/add_supplier.html:479
+msgid "+ Add another Supplier Phone Number"
+msgstr "اضافة رقم هاتف اخر للمورد"
 
 #: templates/admin/base.html:3
 msgid "Django site admin"
@@ -592,9 +843,9 @@ msgid "Key Performance Indicators"
 msgstr "مؤشرات الأداء الرئيسية"
 
 #: templates/admin/dashboard.html:153 templates/admin/dashboard.html:183
-#: templates/admin/dashboard.html:589
+#: templates/admin/dashboard.html:583
 msgid "EGP"
-msgstr ""
+msgstr "جنية مصري"
 
 #: templates/admin/dashboard.html:157 templates/admin/dashboard.html:187
 msgid "Last 30 Days"
@@ -674,6 +925,7 @@ msgid "Status"
 msgstr "الحالة"
 
 #: templates/admin/dashboard.html:326 templates/admin/dashboard.html:440
+#: templates/admin/view_clients.html:57
 msgid "Actions"
 msgstr "الإجراءات"
 
@@ -721,63 +973,51 @@ msgstr "عرض جميع الفواتير"
 msgid "Quick Actions"
 msgstr "الإجراءات السريعة"
 
-#: templates/admin/dashboard.html:496
-msgid "Create Sale"
-msgstr "إنشاء بيع"
-
 #: templates/admin/dashboard.html:497
-msgid "Record a new sales invoice"
-msgstr "تسجيل فاتورة بيع جديدة"
-
-#: templates/admin/dashboard.html:504
-msgid "Create Purchase"
-msgstr "إنشاء شراء"
-
-#: templates/admin/dashboard.html:505
-msgid "Record a new purchase invoice"
-msgstr "تسجيل فاتورة شراء جديدة"
-
-#: templates/admin/dashboard.html:512
-msgid "Add Client"
-msgstr "إضافة عميل"
-
-#: templates/admin/dashboard.html:513
 msgid "Register a new client"
 msgstr "تسجيل عميل جديد"
 
-#: templates/admin/dashboard.html:520
-msgid "Add Supplier"
-msgstr "إضافة مورد"
+#: templates/admin/dashboard.html:503
+msgid "Create Sale"
+msgstr "إنشاء بيع"
 
-#: templates/admin/dashboard.html:521
+#: templates/admin/dashboard.html:504
+msgid "Record a new sales invoice"
+msgstr "تسجيل فاتورة بيع جديدة"
+
+#: templates/admin/dashboard.html:510
+msgid "Create Purchase"
+msgstr "إنشاء شراء"
+
+#: templates/admin/dashboard.html:511
+msgid "Record a new purchase invoice"
+msgstr "تسجيل فاتورة شراء جديدة"
+
+#: templates/admin/dashboard.html:518
 msgid "Register a new supplier"
 msgstr "تسجيل مورد جديد"
 
-#: templates/admin/dashboard.html:528
-msgid "Add Product"
-msgstr "إضافة منتج"
-
-#: templates/admin/dashboard.html:529
+#: templates/admin/dashboard.html:525
 msgid "Add a new inventory item"
 msgstr "إضافة عنصر مخزون جديد"
 
-#: templates/admin/dashboard.html:536
+#: templates/admin/dashboard.html:531
 msgid "Record Payment"
 msgstr "تسجيل دفعة"
 
-#: templates/admin/dashboard.html:537
+#: templates/admin/dashboard.html:532
 msgid "Record a payment transaction"
 msgstr "تسجيل معاملة دفع"
 
-#: templates/admin/dashboard.html:599
+#: templates/admin/dashboard.html:593
 msgid "Amount (EGP)"
 msgstr "المبلغ ($)"
 
-#: templates/admin/dashboard.html:614
+#: templates/admin/dashboard.html:608
 msgid "Month"
 msgstr "الشهر"
 
-#: templates/admin/dashboard.html:730
+#: templates/admin/dashboard.html:724
 msgid "Failed to update chart. Please try again."
 msgstr "فشل في تحديث المخطط. الرجاء المحاولة مرة أخرى"
 
@@ -792,10 +1032,6 @@ msgstr "تسجيل الدخول إلى لوحة التحكم"
 #: templates/admin/login.html:270
 msgid "Access your account to manage your business"
 msgstr "قم بالوصول إلى حسابك لإدارة أعمالك"
-
-#: templates/admin/login.html:279
-msgid "Please correct the errors below."
-msgstr "يرجى تصحيح الأخطاء أدناه."
 
 #: templates/admin/login.html:293
 msgid "Username"
@@ -816,6 +1052,26 @@ msgstr "ادخل كلمة المرور"
 #: templates/admin/login.html:323
 msgid "Remember me"
 msgstr "تذكرني"
+
+#: templates/admin/view_clients.html:8 templates/admin/view_clients.html:19
+msgid "View Clients"
+msgstr "العملاء النشطين"
+
+#: templates/admin/view_clients.html:43
+msgid "Client List"
+msgstr "العملاء"
+
+#: templates/admin/view_clients.html:71
+msgid "View/Edit"
+msgstr "عرض"
+
+#: templates/admin/view_clients.html:80
+msgid "No clients found."
+msgstr "لم يتم العثور على فواتير حديثة."
+
+#: templates/admin/view_clients.html:89
+msgid "Back to Dashboard"
+msgstr "نظرة عامة على لوحة التحكم"
 
 #~ msgid "USD"
 #~ msgstr "دولار أمريكي"

@@ -484,61 +484,55 @@
 
     <!-- Quick Actions Panel -->
     <section class="quick-actions">
-        <h2 class="section-title">
-            <span class="title-text">{% trans "Quick Actions" %}</span>
-            <i class="fas fa-bolt"></i>
-        </h2>
-        <div class="actions-grid">
-            <a href="{% url 'admin:accounting_invoice_add' %}?invoice_type=sale" class="action-card">
-                <div class="action-icon">
-                    <i class="fas fa-shopping-bag"></i>
-                </div>
-                <h3>{% trans "Create Sale" %}</h3>
-                <p>{% trans "Record a new sales invoice" %}</p>
-            </a>
-            
-            <a href="{% url 'admin:accounting_invoice_add' %}?invoice_type=purchase" class="action-card">
-                <div class="action-icon">
-                    <i class="fas fa-box-open"></i>
-                </div>
-                <h3>{% trans "Create Purchase" %}</h3>
-                <p>{% trans "Record a new purchase invoice" %}</p>
-            </a>
-            
-            <a href="{% url 'admin:accounting_client_add' %}" class="action-card">
-                <div class="action-icon">
-                    <i class="fas fa-user-plus"></i>
-                </div>
-                <h3>{% trans "Add Client" %}</h3>
-                <p>{% trans "Register a new client" %}</p>
-            </a>
-            
-            <a href="{% url 'admin:accounting_supplier_add' %}" class="action-card">
-                <div class="action-icon">
-                    <i class="fas fa-industry"></i>
-                </div>
-                <h3>{% trans "Add Supplier" %}</h3>
-                <p>{% trans "Register a new supplier" %}</p>
-            </a>
-            
-            <a href="{% url 'admin:accounting_product_add' %}" class="action-card">
-                <div class="action-icon">
-                    <i class="fas fa-cube"></i>
-                </div>
-                <h3>{% trans "Add Product" %}</h3>
-                <p>{% trans "Add a new inventory item" %}</p>
-            </a>
-            
-            <a href="{% url 'admin:accounting_payment_add' %}" class="action-card">
-                <div class="action-icon">
-                    <i class="fas fa-credit-card"></i>
-                </div>
-                <h3>{% trans "Record Payment" %}</h3>
-                <p>{% trans "Record a payment transaction" %}</p>
-            </a>
-        </div>
-    </section>
-</div>
+    <h2 class="section-title">
+        <span class="title-text">{% trans "Quick Actions" %}</span>
+        <i class="fas fa-bolt"></i>
+    </h2>
+    <div class="actions-grid">
+        <a href="{% url 'accounting:add_client' %}" class="action-card">
+            <div class="action-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h3>{% trans "Add Client" %}</h3>
+            <p>{% trans "Register a new client" %}</p>
+        </a>
+        <a href="{% url 'accounting:add_invoice' %}?invoice_type=sale" class="action-card">
+            <div class="action-icon">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <h3>{% trans "Create Sale" %}</h3>
+            <p>{% trans "Record a new sales invoice" %}</p>
+        </a>
+        <a href="{% url 'accounting:add_invoice' %}?invoice_type=purchase" class="action-card">
+            <div class="action-icon">
+                <i class="fas fa-box-open"></i>
+            </div>
+            <h3>{% trans "Create Purchase" %}</h3>
+            <p>{% trans "Record a new purchase invoice" %}</p>
+        </a>
+        <a href="{% url 'accounting:add_supplier' %}" class="action-card">
+            <div class="action-icon">
+                <i class="fas fa-industry"></i>
+            </div>
+            <h3>{% trans "Add Supplier" %}</h3>
+            <p>{% trans "Register a new supplier" %}</p>
+        </a>
+        <a href="{% url 'accounting:add_product' %}" class="action-card">
+            <div class="action-icon">
+                <i class="fas fa-cube"></i>
+            </div>
+            <h3>{% trans "Add Product" %}</h3>
+            <p>{% trans "Add a new inventory item" %}</p>
+        </a>
+        <a href="{% url 'accounting:add_payment' %}" class="action-card">
+            <div class="action-icon">
+                <i class="fas fa-credit-card"></i>
+            </div>
+            <h3>{% trans "Record Payment" %}</h3>
+            <p>{% trans "Record a payment transaction" %}</p>
+        </a>
+    </div>
+</section>
 
 <!-- Chart.js Script -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>

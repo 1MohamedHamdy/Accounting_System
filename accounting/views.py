@@ -11,9 +11,16 @@ from .serializers import (
     ClientSerializer, SupplierSerializer, ProductSerializer,
     InvoiceSerializer, PaymentSerializer
 )
+
+from .forms import (
+    ClientForm, ClientPhoneNumberForm, SupplierForm,
+    SupplierPhoneNumberForm, ProductForm, InvoiceForm, PaymentForm,
+    InvoiceItemForm
+)
 from .reports import generate_sales_report, generate_purchases_report
 import openpyxl
 from datetime import datetime
+from django.db import transaction
 
 
 class ClientViewSet(viewsets.ModelViewSet):
@@ -179,3 +186,186 @@ class PurchasesReportView(generics.GenericAPIView):
         response['Content-Disposition'] = f'attachment; filename={report_name}.xlsx'
         wb.save(response)
         return response
+    
+    
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.decorators import login_required
+from .models import Client, ClientPhoneNumber, Supplier, SupplierPhoneNumber, Product, Invoice, Payment
+from .forms import ClientForm, ClientPhoneNumberForm, SupplierForm, SupplierPhoneNumberForm, ProductForm, InvoiceForm, PaymentForm
+from django.forms import formset_factory
+
+@login_required
+def add_client(request):
+    PhoneNumberFormSet = formset_factory(ClientPhoneNumberForm, extra=1, can_delete=True)
+    
+    if request.method == 'POST':
+        client_form = ClientForm(request.POST)
+        phone_formset = PhoneNumberFormSet(request.POST, prefix='phones')
+        
+        if client_form.is_valid() and phone_formset.is_valid():
+            try:
+                client = client_form.save()
+                for phone_form in phone_formset:
+                    if phone_form.cleaned_data and not phone_form.cleaned_data.get('DELETE', False):
+                        if phone_form.cleaned_data.get('number'):
+                            phone = phone_form.save(commit=False)
+                            phone.client = client
+                            phone.save()
+                messages.success(request, _("Client added successfully!"))
+                if '_addanother' in request.POST:
+                    return redirect('admin:accounting_add_client')
+                elif '_continue' in request.POST:
+                    return redirect('admin:accounting_client_change', client.id)
+                return redirect('admin:accounting_dashboardstats')
+            except Exception as e:
+                messages.error(request, _("Error adding client: ") + str(e))
+        else:
+            messages.error(request, _("Please correct the errors below."))
+    else:
+        client_form = ClientForm()
+        phone_formset = PhoneNumberFormSet(prefix='phones')
+
+    context = {
+        'client_form': client_form,
+        'phone_formset': phone_formset,
+        'app_label': 'accounting',
+    }
+    return render(request, 'admin/add_client.html', context)
+
+@login_required
+def add_supplier(request):
+    PhoneNumberFormSet = formset_factory(SupplierPhoneNumberForm, extra=1, can_delete=True)
+    
+    if request.method == 'POST':
+        supplier_form = SupplierForm(request.POST)
+        phone_formset = PhoneNumberFormSet(request.POST, prefix='phones')
+        
+        if supplier_form.is_valid() and phone_formset.is_valid():
+            try:
+                supplier = supplier_form.save()
+                for phone_form in phone_formset:
+                    if phone_form.cleaned_data and not phone_form.cleaned_data.get('DELETE', False):
+                        if phone_form.cleaned_data.get('number'):
+                            phone = phone_form.save(commit=False)
+                            phone.supplier = supplier
+                            phone.save()
+                messages.success(request, _("Supplier added successfully!"))
+                if '_addanother' in request.POST:
+                    return redirect('admin:accounting_add_supplier')
+                elif '_continue' in request.POST:
+                    return redirect('admin:accounting_supplier_change', supplier.id)
+                return redirect('admin:accounting_dashboardstats')
+            except Exception as e:
+                messages.error(request, _("Error adding supplier: ") + str(e))
+        else:
+            messages.error(request, _("Please correct the errors below."))
+    else:
+        supplier_form = SupplierForm()
+        phone_formset = PhoneNumberFormSet(prefix='phones')
+
+    context = {
+        'supplier_form': supplier_form,
+        'phone_formset': phone_formset,
+        'app_label': 'accounting',
+    }
+    return render(request, 'admin/add_supplier.html', context)
+
+@login_required
+def add_product(request):
+    if request.method == 'POST':
+        product_form = ProductForm(request.POST, request.FILES)
+        
+        if product_form.is_valid():
+            try:
+                product = product_form.save()
+                messages.success(request, _("Product added successfully!"))
+                if '_addanother' in request.POST:
+                    return redirect('admin:accounting_add_product')
+                elif '_continue' in request.POST:
+                    return redirect('admin:accounting_product_change', product.id)
+                return redirect('admin:accounting_dashboardstats')
+            except Exception as e:
+                messages.error(request, _("Error adding product: ") + str(e))
+        else:
+            messages.error(request, _("Please correct the errors below."))
+    else:
+        product_form = ProductForm()
+
+    context = {
+        'product_form': product_form,
+        'app_label': 'accounting',
+    }
+    return render(request, 'admin/add_product.html', context)
+
+@login_required
+def add_invoice(request):
+    InvoiceItemFormSet = formset_factory(InvoiceItemForm, extra=1, can_delete=True)
+    
+    if request.method == 'POST':
+        invoice_form = InvoiceForm(request.POST)
+        item_formset = InvoiceItemFormSet(request.POST, prefix='items')
+        
+        if invoice_form.is_valid() and item_formset.is_valid():
+            try:
+                with transaction.atomic():
+                    invoice = invoice_form.save()
+                    total_amount = 0
+                    for item_form in item_formset:
+                        if item_form.cleaned_data and not item_form.cleaned_data.get('DELETE', False):
+                            item = item_form.save(commit=False)
+                            item.invoice = invoice
+                            item.total = (item.price * item.quantity) + item.tax_amount - item.discount
+                            item.save()
+                            total_amount += item.total
+                    invoice.total_amount = total_amount
+                    invoice.save()
+                    messages.success(request, _("Invoice added successfully!"))
+                    if '_addanother' in request.POST:
+                        return redirect('admin:accounting_add_invoice')
+                    elif '_continue' in request.POST:
+                        return redirect('admin:accounting_invoice_change', invoice.id)
+                    return redirect('admin:accounting_dashboardstats')
+            except Exception as e:
+                messages.error(request, _("Error adding invoice: ") + str(e))
+        else:
+            messages.error(request, _("Please correct the errors below."))
+    else:
+        invoice_type = request.GET.get('invoice_type', 'sale')
+        initial = {'invoice_type': invoice_type}
+        invoice_form = InvoiceForm(initial=initial)
+        item_formset = InvoiceItemFormSet(prefix='items')
+
+    context = {
+        'invoice_form': invoice_form,
+        'item_formset': item_formset,
+        'app_label': 'accounting',
+    }
+    return render(request, 'admin/add_invoice.html', context)
+
+@login_required
+def add_payment(request):
+    if request.method == 'POST':
+        payment_form = PaymentForm(request.POST)
+        if payment_form.is_valid():
+            try:
+                payment = payment_form.save()
+                messages.success(request, _("Payment added successfully!"))
+                if '_addanother' in request.POST:
+                    return redirect('admin:accounting_add_payment')
+                elif '_continue' in request.POST:
+                    return redirect('admin:accounting_payment_change', payment.id)
+                return redirect('admin:accounting_dashboardstats')
+            except Exception as e:
+                messages.error(request, _("Error adding payment: ") + str(e))
+        else:
+            messages.error(request, _("Please correct the errors below."))
+    else:
+        payment_form = PaymentForm()
+
+    context = {
+        'payment_form': payment_form,
+        'app_label': 'accounting',
+    }
+    return render(request, 'admin/add_payment.html', context)
