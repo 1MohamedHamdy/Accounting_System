@@ -1,0 +1,533 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600&family=Segoe+UI:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-light: #e6e9ff;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --dark-color: #2b2d42;
+            --light-color: #f8f9fa;
+            --gray-color: #6c757d;
+            --light-gray: #e9ecef;
+            --white: #ffffff;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --spacing-unit: 16px;
+        }
+
+        body {
+            font-family: {% if LANGUAGE_CODE == 'ar' %}'Noto Sans Arabic', sans-serif{% else %}'Segoe UI', Tahoma, Geneva, Verdana, sans-serif{% endif %};
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: var(--spacing-unit);
+        }
+
+        [dir="rtl"] {
+            direction: rtl;
+            text-align: right;
+        }
+
+        [dir="ltr"] {
+            direction: ltr;
+            text-align: left;
+        }
+
+        .quick-actions {
+            margin-bottom: var(--spacing-unit);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: calc(var(--spacing-unit) / 2);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: calc(var(--spacing-unit) / 2);
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-unit);
+        }
+
+        .action-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: var(--spacing-unit);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .action-card:hover {
+            background-color: var(--primary-light);
+        }
+
+        .action-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: calc(var(--spacing-unit) / 2);
+        }
+
+        .action-card h3 {
+            margin: 0 0 calc(var(--spacing-unit) / 4) 0;
+            font-size: 1.1rem;
+            color: var(--dark-color);
+        }
+
+        .action-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--gray-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            padding: var(--spacing-unit);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-unit);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--dark-color);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-color);
+        }
+
+        .modal-body {
+            margin-bottom: var(--spacing-unit);
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: calc(var(--spacing-unit) / 2);
+            border: 1px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: calc(var(--spacing-unit) / 2);
+            justify-content: flex-end;
+        }
+
+        .modal-button {
+            padding: 10px 16px;
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-button.primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+        }
+
+        .modal-button.primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .modal-button.secondary {
+            background-color: var(--white);
+            color: var(--gray-color);
+            border: 1px solid var(--light-gray);
+        }
+
+        .modal-button.secondary:hover {
+            background-color: var(--light-color);
+        }
+
+        .view-details {
+            display: none;
+            padding: var(--spacing-unit);
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            margin-top: calc(var(--spacing-unit) / 2);
+        }
+
+        .view-details.active {
+            display: block;
+        }
+
+        .detail-group {
+            margin-bottom: var(--spacing-unit);
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-unit);
+        }
+
+        .detail-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .detail-item label {
+            display: block;
+            margin-bottom: calc(var(--spacing-unit) / 4);
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .detail-item span {
+            font-size: 0.95rem;
+            color: var(--gray-color);
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="quick-actions">
+        <h2 class="section-title">
+            <span class="title-text">{% trans "Quick Actions" %}</span>
+            <i class="fas fa-bolt"></i>
+        </h2>
+        <div class="actions-grid">
+            <a href="{% url 'admin:accounting_client_add' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h3>{% trans "Add Client" %}</h3>
+                <p>{% trans "Register a new client" %}</p>
+            </a>
+            <a href="{% url 'admin:accounting_invoice_add' %}?invoice_type=sale" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <h3>{% trans "Create Sale" %}</h3>
+                <p>{% trans "Record a new sales invoice" %}</p>
+            </a>
+            <a href="{% url 'admin:accounting_invoice_add' %}?invoice_type=purchase" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <h3>{% trans "Create Purchase" %}</h3>
+                <p>{% trans "Record a new purchase invoice" %}</p>
+            </a>
+            <a href="{% url 'admin:accounting_supplier_add' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-industry"></i>
+                </div>
+                <h3>{% trans "Add Supplier" %}</h3>
+                <p>{% trans "Register a new supplier" %}</p>
+            </a>
+            <a href="{% url 'admin:accounting_product_add' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-cube"></i>
+                </div>
+                <h3>{% trans "Add Product" %}</h3>
+                <p>{% trans "Add a new inventory item" %}</p>
+            </a>
+            <a href="{% url 'admin:accounting_payment_add' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <h3>{% trans "Record Payment" %}</h3>
+                <p>{% trans "Record a payment transaction" %}</p>
+            </a>
+            <div class="action-card" data-modal="view-clients-modal">
+                <div class="action-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>{% trans "View Clients" %}</h3>
+                <p>{% trans "Browse client records" %}</p>
+            </div>
+            <div class="action-card" data-modal="view-suppliers-modal">
+                <div class="action-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h3>{% trans "View Suppliers" %}</h3>
+                <p>{% trans "Browse supplier records" %}</p>
+            </div>
+            <div class="action-card" data-modal="view-products-modal">
+                <div class="action-icon">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <h3>{% trans "View Products" %}</h3>
+                <p>{% trans "Browse inventory items" %}</p>
+            </div>
+            <div class="action-card" data-modal="view-invoices-modal">
+                <div class="action-icon">
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <h3>{% trans "View Invoices" %}</h3>
+                <p>{% trans "Browse invoice records" %}</p>
+            </div>
+            <div class="action-card" data-modal="view-payments-modal">
+                <div class="action-icon">
+                    <i class="fas fa-money-check-alt"></i>
+                </div>
+                <h3>{% trans "View Payments" %}</h3>
+                <p>{% trans "Browse payment records" %}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="view-clients-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{% trans "Select Client to View" %}</h3>
+                <button class="close-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <select class="filter-input" data-model="client">
+                    <option value="">{% trans "Select a client" %}</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button secondary close-modal">{% trans "Cancel" %}</button>
+                <button class="modal-button primary" data-action="view">{% trans "View" %}</button>
+            </div>
+            <div class="view-details" id="view-client-details"></div>
+        </div>
+    </div>
+    <div class="modal" id="view-suppliers-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{% trans "Select Supplier to View" %}</h3>
+                <button class="close-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <select class="filter-input" data-model="supplier">
+                    <option value="">{% trans "Select a supplier" %}</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button secondary close-modal">{% trans "Cancel" %}</button>
+                <button class="modal-button primary" data-action="view">{% trans "View" %}</button>
+            </div>
+            <div class="view-details" id="view-supplier-details"></div>
+        </div>
+    </div>
+    <div class="modal" id="view-products-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{% trans "Select Product to View" %}</h3>
+                <button class="close-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <select class="filter-input" data-model="product">
+                    <option value="">{% trans "Select a product" %}</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button secondary close-modal">{% trans "Cancel" %}</button>
+                <button class="modal-button primary" data-action="view">{% trans "View" %}</button>
+            </div>
+            <div class="view-details" id="view-product-details"></div>
+        </div>
+    </div>
+    <div class="modal" id="view-invoices-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{% trans "Select Invoice to View" %}</h3>
+                <button class="close-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <select class="filter-input" data-model="invoice">
+                    <option value="">{% trans "Select an invoice" %}</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button secondary close-modal">{% trans "Cancel" %}</button>
+                <button class="modal-button primary" data-action="view">{% trans "View" %}</button>
+            </div>
+            <div class="view-details" id="view-invoice-details"></div>
+        </div>
+    </div>
+    <div class="modal" id="view-payments-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{% trans "Select Payment to View" %}</h3>
+                <button class="close-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <select class="filter-input" data-model="payment">
+                    <option value="">{% trans "Select a payment" %}</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button secondary close-modal">{% trans "Cancel" %}</button>
+                <button class="modal-button primary" data-action="view">{% trans "View" %}</button>
+            </div>
+            <div class="view-details" id="view-payment-details"></div>
+        </div>
+    </div>
+
+    {% block content_title %}{% endblock %}
+    {% block content_main %}{% endblock %}
+{% endblock %}
+
+{% block extrajs %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const viewActionCards = document.querySelectorAll('.action-card[data-modal]');
+            const modals = document.querySelectorAll('.modal');
+            const closeModalButtons = document.querySelectorAll('.close-modal');
+
+            viewActionCards.forEach(card => {
+                card.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const modalId = card.getAttribute('data-modal');
+                    const modal = document.getElementById(modalId);
+                    if (modal) {
+                        modal.style.display = 'flex';
+                        const select = modal.querySelector('.filter-input');
+                        const viewButton = modal.querySelector('.modal-button.primary');
+                        const model = select.getAttribute('data-model');
+                        fetchOptions(model, select, viewButton, modal);
+                    }
+                });
+            });
+
+            closeModalButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const modal = button.closest('.modal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                        const details = modal.querySelector('.view-details');
+                        if (details) details.innerHTML = '';
+                    }
+                });
+            });
+
+            modals.forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                        const details = modal.querySelector('.view-details');
+                        if (details) details.innerHTML = '';
+                    }
+                });
+            });
+
+            function fetchOptions(model, select, viewButton, modal) {
+                const url = `/admin/accounting/${model}s/options/`;
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        select.innerHTML = `<option value="">{% trans "Select a ${model}" %}</option>`;
+                        data.options.forEach(option => {
+                            const opt = document.createElement('option');
+                            opt.value = option.id;
+                            opt.textContent = option.name;
+                            select.appendChild(opt);
+                        });
+                        select.addEventListener('change', () => {
+                            viewButton.disabled = !select.value;
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching options:', error);
+                        select.innerHTML = `<option value="">{% trans "Error loading options" %}</option>`;
+                        viewButton.disabled = true;
+                    });
+            }
+
+            document.querySelectorAll('.modal-button.primary').forEach(button => {
+                button.addEventListener('click', () => {
+                    const modal = button.closest('.modal');
+                    const select = modal.querySelector('.filter-input');
+                    const model = select.getAttribute('data-model');
+                    const id = select.value;
+                    if (id) {
+                        fetchViewDetails(model, id, modal);
+                    }
+                });
+            });
+
+            function fetchViewDetails(model, id, modal) {
+                const url = `/admin/accounting/${model}/${id}/view/`;
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        const detailsDiv = modal.querySelector('.view-details');
+                        if (detailsDiv) {
+                            detailsDiv.innerHTML = `
+                                <div class="view-header">
+                                    <i class="fas fa-${model === 'client' ? 'user' : model === 'supplier' ? 'building' : model === 'product' ? 'cube' : model === 'invoice' ? 'file-invoice' : 'money-check-alt'}"></i>
+                                    <h1>{% trans "View ${model|title}" %}</h1>
+                                </div>
+                                <div class="view-content">
+                                    <div class="section-header">{% trans "${model|title} Details" %}</div>
+                                    <div class="detail-group">
+                                        ${Object.entries(data).map(([key, value]) => `
+                                            <div class="detail-item">
+                                                <label>{% trans "${key.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}" %}</label>
+                                                <span>${value || 'N/A'}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div class="button-group">
+                                        <a href="{% url 'admin:accounting_${model}_change' 123 %}" class="action-button primary" data-id="${id}">
+                                            <i class="fas fa-edit"></i> {% trans "Edit ${model|title}" %}
+                                        </a>
+                                        <a href="{% url 'admin:accounting_${model}_delete' 123 %}" class="action-button danger" data-id="${id}">
+                                            <i class="fas fa-trash"></i> {% trans "Delete ${model|title}" %}
+                                        </a>
+                                        <button class="action-button secondary close-modal">
+                                            <i class="fas fa-arrow-left"></i> {% trans "Back" %}
+                                        </button>
+                                    </div>
+                                </div>
+                            `.replace(/123/g, id);
+                            detailsDiv.classList.add('active');
+                        }
+                    })
+                    .catch(error => console.error('Error fetching details:', error));
+            }
+        });
+    </script>
+{% endblock %}

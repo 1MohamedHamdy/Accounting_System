@@ -2,7 +2,7 @@ from rest_framework import viewsets, generics, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .models import (
     Client, ClientPhoneNumber, Supplier, SupplierPhoneNumber,
     Product, Invoice, InvoiceItem, Payment
@@ -19,7 +19,7 @@ from .forms import (
 )
 from .reports import generate_sales_report, generate_purchases_report
 import openpyxl
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.db import transaction
 
 
@@ -195,6 +195,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Client, ClientPhoneNumber, Supplier, SupplierPhoneNumber, Product, Invoice, Payment
 from .forms import ClientForm, ClientPhoneNumberForm, SupplierForm, SupplierPhoneNumberForm, ProductForm, InvoiceForm, PaymentForm
 from django.forms import formset_factory
+from django.views.decorators.http import require_GET
 
 @login_required
 def add_client(request):
@@ -369,3 +370,92 @@ def add_payment(request):
         'app_label': 'accounting',
     }
     return render(request, 'admin/add_payment.html', context)
+
+
+@login_required
+def view_client(request, client_id):
+    client = get_object_or_404(Client, id=client_id)
+    if request.method == 'GET' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        data = {
+            'name': client.name,
+            'business_type': client.get_business_type_display(),
+            'address': client.address,
+            'national_id': client.national_id,
+            'tax_number': client.tax_number,
+            'num_of_invoices': client.num_of_invoices,
+            'phone_numbers': [f"{p.number} ({p.description or 'N/A'})" for p in client.clientphonenumber_set.all()]
+        }
+        return JsonResponse(data)
+    return render(request, 'admin/view_client.html', {'client': client})
+
+@login_required
+def view_supplier(request, supplier_id):
+    supplier = get_object_or_404(Supplier, id=supplier_id)
+    if request.method == 'GET' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        data = {
+            'name': supplier.name,
+            'business_type': supplier.get_business_type_display(),
+            'address': supplier.address,
+            'national_id': supplier.national_id,
+            'tax_number': supplier.tax_number,
+            'num_of_invoices': supplier.num_of_invoices,
+            'phone_numbers': [f"{p.number} ({p.description or 'N/A'})" for p in supplier.supplierphonenumber_set.all()]
+        }
+        return JsonResponse(data)
+    return render(request, 'admin/view_supplier.html', {'supplier': supplier})
+
+@login_required
+def view_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if request.method == 'GET' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        data = {
+            'name': product.name,
+            'description': product.description,
+            'quantity_in_stock': product.quantity_in_stock,
+            'unit_price': product.unit_price,
+            'reorder_level': product.reorder_level
+        }
+        return JsonResponse(data)
+    return render(request, 'admin/view_product.html', {'product': product})
+
+@login_required
+def view_invoice(request, invoice_id):
+    invoice = get_object_or_404(Invoice, id=invoice_id)
+    if request.method == 'GET' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        data = {
+            'invoice_number': invoice.invoice_number,
+            'invoice_date': invoice.invoice_date,
+            'client_name': invoice.client.name if invoice.client else 'N/A',
+            'total_amount': invoice.total_amount,
+            'invoice_type': invoice.get_invoice_type_display()
+        }
+        return JsonResponse(data)
+    return render(request, 'admin/view_invoice.html', {'invoice': invoice})
+
+@login_required
+def view_payment(request, payment_id):
+    payment = get_object_or_404(Payment, id=payment_id)
+    if request.method == 'GET' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        data = {
+            'payment_date': payment.payment_date,
+            'amount': payment.amount,
+            'payment_method': payment.get_payment_method_display(),
+            'invoice': payment.invoice.invoice_number if payment.invoice else 'N/A'
+        }
+        return JsonResponse(data)
+    return render(request, 'admin/view_payment.html', {'payment': payment})
+
+@require_GET
+def get_model_options(request, model_name):
+    model_map = {
+        'clients': Client,
+        'suppliers': Supplier,
+        'products': Product,
+        'invoices': Invoice,
+        'payments': Payment,
+    }
+    if model_name not in model_map:
+        return JsonResponse({'error': 'Invalid model name'}, status=400)
+    model = model_map[model_name]
+    options = [{'id': obj.id, 'name': str(obj)} for obj in model.objects.all()]
+    return JsonResponse({'options': options})

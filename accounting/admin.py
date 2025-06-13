@@ -60,6 +60,14 @@ class ClientAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+    change_list_template = 'admin/accounting/change_list.html'
+    def view_link(self, obj):
+        return format_html(
+            '<a href="{}" class="button" style="padding: 2px 8px; background: #417690; color: white; border-radius: 3px;">{}</a>',
+            reverse('admin:accounting_{}_change'.format(self.model._meta.model_name), args=[obj.id]),
+            _("View")
+        )
+    view_link.short_description = ''
 
 @admin.register(Supplier)
 class SupplierAdmin(admin.ModelAdmin):
@@ -82,6 +90,14 @@ class SupplierAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+    change_list_template = 'admin/accounting/change_list.html'
+    def view_link(self, obj):
+        return format_html(
+            '<a href="{}" class="button" style="padding: 2px 8px; background: #417690; color: white; border-radius: 3px;">{}</a>',
+            reverse('admin:accounting_{}_change'.format(self.model._meta.model_name), args=[obj.id]),
+            _("View")
+        )
+    view_link.short_description = ''
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -106,7 +122,7 @@ class ProductAdmin(admin.ModelAdmin):
             'description': _("QR code is automatically generated based on product name and code.")
         }),
     )
-
+    change_list_template = 'admin/accounting/change_list.html'
     def qr_code_preview(self, obj):
         if obj.qr_code:
             return format_html(
@@ -170,6 +186,14 @@ class ProductAdmin(admin.ModelAdmin):
         wb.save(response)
         return response
     export_to_excel.short_description = _("Export selected products to Excel")
+    
+    def view_link(self, obj):
+        return format_html(
+            '<a href="{}" class="button" style="padding: 2px 8px; background: #417690; color: white; border-radius: 3px;">{}</a>',
+            reverse('admin:accounting_{}_change'.format(self.model._meta.model_name), args=[obj.id]),
+            _("View")
+        )
+    view_link.short_description = ''
 
 class InvoiceItemInline(admin.TabularInline):
     model = InvoiceItem
@@ -188,6 +212,7 @@ class InvoiceAdmin(admin.ModelAdmin):
     date_hierarchy = 'invoice_date'
     actions = ['export_to_excel', 'mark_as_paid', 'mark_as_unpaid']
     list_per_page = 20
+    change_list_template = 'admin/accounting/change_list.html'
 
     def client_or_supplier(self, obj):
         if obj.invoice_type == 'sale':
@@ -248,6 +273,14 @@ class InvoiceAdmin(admin.ModelAdmin):
         updated = queryset.update(payment_status='unpaid')
         self.message_user(request, _("%(count)s invoices marked as unpaid.") % {'count': updated})
     mark_as_unpaid.short_description = _("Mark selected invoices as unpaid")
+    
+    def view_link(self, obj):
+        return format_html(
+            '<a href="{}" class="button" style="padding: 2px 8px; background: #417690; color: white; border-radius: 3px;">{}</a>',
+            reverse('admin:accounting_{}_change'.format(self.model._meta.model_name), args=[obj.id]),
+            _("View")
+        )
+    view_link.short_description = ''
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
@@ -256,10 +289,19 @@ class PaymentAdmin(admin.ModelAdmin):
     search_fields = ('invoice__invoice_number',)
     readonly_fields = ('remaining_amount',)
     date_hierarchy = 'payment_date'
+    change_list_template = 'admin/accounting/change_list.html'
 
     def remaining_amount(self, obj):
         return obj.remaining_amount
     remaining_amount.short_description = _("Remaining Amount")
+    
+    def view_link(self, obj):
+        return format_html(
+            '<a href="{}" class="button" style="padding: 2px 8px; background: #417690; color: white; border-radius: 3px;">{}</a>',
+            reverse('admin:accounting_{}_change'.format(self.model._meta.model_name), args=[obj.id]),
+            _("View")
+        )
+    view_link.short_description = ''
 
 @admin.register(DashboardStats)
 class DashboardStatsAdmin(admin.ModelAdmin):

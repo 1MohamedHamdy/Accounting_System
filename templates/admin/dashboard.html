@@ -6,8 +6,1273 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% trans "Dashboard" %}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <style>
+    /* Daftra Color Scheme */
+    :root {
+        --primary-color: #1e4b8f;
+        --primary-light: #e6f0ff;
+        --secondary-color: #2c6fd1;
+        --success-color: #4caf50;
+        --warning-color: #ff9800;
+        --danger-color: #f44336;
+        --info-color: #2196f3;
+        --dark-color: #263238;
+        --light-color: #f5f7fa;
+        --gray-color: #78909c;
+        --light-gray: #cfd8dc;
+        --white: #ffffff;
+        --border-radius: 6px;
+        --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Noto Sans Arabic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: var(--dark-color);
+        background-color: #f5f7fa;
+        display: flex;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .dashboard-container {
+        width: 100%;
+        max-width: 1800px;
+        margin: 0 auto;
+        display: grid;
+        grid-gap: 24px;
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: var(--white);
+        padding: 20px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        margin-bottom: 10px;
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    [dir="ltr"] .header-content {
+        justify-content: space-between;
+    }
+
+    [dir="rtl"] .header-content {
+        justify-content: flex-end;
+        flex-direction: row-reverse;
+    }
+
+    .dashboard-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    [dir="ltr"] .dashboard-title {
+        flex-direction: row;
+    }
+
+    [dir="rtl"] .dashboard-title {
+        flex-direction: row-reverse;
+        text-align: right;
+        justify-content: flex-end;
+    }
+
+    .dashboard-title span {
+        display: inline;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .language-switcher {
+        position: relative;
+    }
+
+    .language-select {
+        padding: 8px 12px;
+        border-radius: var(--border-radius);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background-color: rgba(255, 255, 255, 0.1);
+        color: var(--white);
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .language-select:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .language-select:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+    }
+
+    /* Section Titles */
+    .section-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: var(--dark-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--light-gray);
+    }
+
+    .section-title .title-text {
+        flex-grow: 1;
+    }
+
+    [dir="ltr"] .section-title {
+        flex-direction: row;
+        justify-content: flex-start;
+    }
+
+    [dir="rtl"] .section-title {
+        flex-direction: row;
+        justify-content: flex-end;
+        text-align: right;
+    }
+
+    /* Notification Center */
+    .notification-center {
+        margin-bottom: 20px;
+    }
+
+    .notifications-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+    }
+
+    .notification-card {
+        padding: 16px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        transition: var(--transition);
+        background: var(--white);
+    }
+
+    [dir="rtl"] .notification-card {
+        flex-direction: row-reverse;
+    }
+
+    .notification-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .notification-card.alert {
+        border-left: 4px solid var(--warning-color);
+        background: rgba(255, 152, 0, 0.05);
+    }
+
+    [dir="rtl"] .notification-card.alert {
+        border-left: none;
+        border-right: 4px solid var(--warning-color);
+    }
+
+    .notification-card.info {
+        border-left: 4px solid var(--info-color);
+        background: rgba(33, 150, 243, 0.05);
+    }
+
+    [dir="rtl"] .notification-card.info {
+        border-left: none;
+        border-right: 4px solid var(--info-color);
+    }
+
+    .notification-icon {
+        padding: 8px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.9);
+    }
+
+    .notification-content {
+        flex: 1;
+    }
+
+    .notification-content h3 {
+        font-size: 1.1rem;
+        margin-bottom: 6px;
+        color: var(--dark-color);
+    }
+
+    .notification-content p {
+        font-size: 0.9rem;
+        color: var(--gray-color);
+        margin-bottom: 0;
+    }
+
+    .notification-content a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .notification-content a:hover {
+        text-decoration: underline;
+    }
+
+    .notification-time {
+        font-size: 0.8rem;
+        color: var(--gray-color);
+        white-space: nowrap;
+    }
+
+    /* Filter Panel */
+    .filter-panel {
+        background-color: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .filter-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        cursor: pointer;
+        background-color: var(--light-color);
+    }
+
+    [dir="ltr"] .filter-header {
+        flex-direction: row;
+    }
+
+    [dir="rtl"] .filter-header {
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+
+    .filter-header .section-title {
+        flex-grow: 1;
+        margin: 0;
+        border-bottom: none;
+    }
+
+    .filter-toggle {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        transition: var(--transition);
+    }
+
+    .filter-toggle:hover {
+        color: var(--dark-color);
+    }
+
+    .filter-content {
+        padding: 20px;
+        display: block;
+    }
+
+    .filter-form {
+        width: 100%;
+    }
+
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 10px;
+    }
+
+    .form-group {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--dark-color);
+    }
+
+    .filter-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--light-gray);
+        border-radius: var(--border-radius);
+        font-size: 0.95rem;
+        transition: var(--transition);
+    }
+
+    .filter-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(30, 75, 143, 0.2);
+    }
+
+    .date-range {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .date-inputs {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    [dir="rtl"] .date-inputs {
+        flex-direction: row-reverse;
+    }
+
+    .date-separator {
+        color: var(--gray-color);
+        font-size: 0.9rem;
+    }
+
+    .form-group.actions {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+    }
+
+    [dir="rtl"] .form-group.actions {
+        flex-direction: row-reverse;
+    }
+
+    .filter-button {
+        padding: 10px 16px;
+        border-radius: var(--border-radius);
+    }
+
+    .filter-button.primary {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border: none;
+    }
+
+    .filter-button.primary:hover {
+        background-color: var(--secondary-color);
+    }
+
+    .filter-button.secondary {
+        background-color: var(--white);
+        color: var(--gray-color);
+        border: 1px solid var(--light-gray);
+    }
+
+    .filter-button.secondary:hover {
+        background-color: var(--light-color);
+        color: var(--dark-color);
+    }
+
+    /* Metrics Section */
+    .metrics-section {
+        margin-bottom: 20px;
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .metric-card {
+        background-color: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .metric-header {
+        padding: 16px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--white);
+    }
+
+    [dir="rtl"] .metric-header {
+        flex-direction: row-reverse;
+    }
+
+    .metric-header h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .metric-header i {
+        font-size: 1.5rem;
+        opacity: 0.8;
+    }
+
+    .metric-card.sales .metric-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    }
+
+    .metric-card.purchases .metric-header {
+        background: linear-gradient(135deg, #2c6fd1, #4caf50);
+    }
+
+    .metric-card.inventory .metric-header {
+        background: linear-gradient(135deg, #ff9800, #f44336);
+    }
+
+    .metric-card.clients .metric-header {
+        background: linear-gradient(135deg, #9c27b0, #673ab7);
+    }
+
+    .metric-body {
+        padding: 20px;
+    }
+
+    .metric-value {
+        margin-bottom: 16px;
+    }
+
+    .metric-value .amount {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--dark-color);
+    }
+
+    .metric-value .currency,
+    .metric-value .unit {
+        font-size: 1rem;
+        color: var(--gray-color);
+        margin-left: 5px;
+    }
+
+    [dir="rtl"] .metric-value .currency,
+    [dir="rtl"] .metric-value .unit {
+        margin-left: 0;
+        margin-right: 5px;
+    }
+
+    .metric-details {
+        display: grid;
+        gap: 12px;
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    [dir="rtl"] .detail-item {
+        flex-direction: row-reverse;
+    }
+
+    .detail-item .label {
+        color: var(--gray-color);
+        font-size: 0.9rem;
+    }
+
+    .detail-item .value {
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+
+    .metric-footer {
+        padding: 12px 20px;
+        background-color: var(--light-color);
+        border-top: 1px solid var(--light-gray);
+    }
+
+    .action-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--primary-color);
+        font-size: 0.9rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    [dir="rtl"] .action-link {
+        flex-direction: row-reverse;
+    }
+
+    .action-link:hover {
+        color: var(--secondary-color);
+        text-decoration: underline;
+    }
+
+    /* Visualization Section */
+    .visualization-section {
+        margin-bottom: 20px;
+    }
+
+    .chart-container {
+        background-color: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 20px;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    [dir="ltr"] .chart-header {
+        flex-direction: row;
+    }
+
+    [dir="rtl"] .chart-header {
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+
+    .chart-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    [dir="rtl"] .chart-actions {
+        flex-direction: row-reverse;
+    }
+
+    .chart-action-btn {
+        padding: 6px 12px;
+        background-color: var(--light-color);
+        border: 1px solid var(--light-gray);
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--gray-color);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .chart-action-btn:hover {
+        background-color: var(--primary-light);
+        color: var(--primary-color);
+    }
+
+    .chart-action-btn.active {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border-color: var(--primary-color);
+    }
+
+    .chart-wrapper {
+        position: relative;
+        height: 400px;
+        width: 100%;
+    }
+
+    /* Activity Section */
+    .activity-section {
+        margin-bottom: 20px;
+    }
+
+    .activity-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--light-gray);
+        margin-bottom: 20px;
+    }
+
+    [dir="rtl"] .activity-tabs {
+        flex-direction: row-reverse;
+    }
+
+    .activity-tab {
+        padding: 10px 20px;
+        background: none;
+        border: none;
+        border-bottom: 3px solid transparent;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--gray-color);
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    [dir="ltr"] .activity-tab {
+        flex-direction: row;
+    }
+
+    [dir="rtl"] .activity-tab {
+        flex-direction: row;
+        justify-content: flex-end;
+        text-align: right;
+    }
+
+    .activity-tab:hover {
+        color: var(--primary-color);
+    }
+
+    .activity-tab.active {
+        color: var(--primary-color);
+        border-bottom-color: var(--primary-color);
+    }
+
+    .activity-content {
+        display: none;
+    }
+
+    .activity-content.active {
+        display: block;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .activity-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+        background-color: var(--white);
+        box-shadow: var(--box-shadow);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+
+    .activity-table th,
+    .activity-table td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--light-gray);
+    }
+
+    [dir="rtl"] .activity-table th,
+    [dir="rtl"] .activity-table td {
+        text-align: right;
+    }
+
+    .activity-table th {
+        background-color: var(--primary-color);
+        font-weight: 600;
+        color: var(--white);
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .activity-table tbody tr:hover {
+        background-color: rgba(30, 75, 143, 0.05);
+    }
+
+    .invoice-link {
+        color: var(--primary-color);
+        font-weight: 500;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .invoice-link:hover {
+        text-decoration: underline;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge.sale {
+        background-color: rgba(30, 75, 143, 0.1);
+        color: var(--primary-color);
+    }
+
+    .badge.purchase {
+        background-color: rgba(255, 152, 0, 0.1);
+        color: var(--warning-color);
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-badge.paid {
+        background-color: rgba(76, 175, 80, 0.1);
+        color: var(--success-color);
+    }
+
+    .status-badge.pending {
+        background-color: rgba(255, 152, 0, 0.1);
+        color: var(--warning-color);
+    }
+
+    .status-badge.unpaid {
+        background-color: rgba(244, 67, 54, 0.1);
+        color: var(--danger-color);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    [dir="rtl"] .action-buttons {
+        flex-direction: row-reverse;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: var(--light-color);
+        color: var(--gray-color);
+        border: none;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .action-btn:hover {
+        background-color: var(--primary-light);
+        color: var(--primary-color);
+    }
+
+    .action-btn.print:hover {
+        background-color: rgba(33, 150, 243, 0.1);
+        color: var(--info-color);
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 40px;
+        color: var(--gray-color);
+        font-style: italic;
+    }
+
+    .table-footer {
+        margin-top: 15px;
+        text-align: right;
+    }
+
+    [dir="rtl"] .table-footer {
+        text-align: left;
+    }
+
+    .view-all {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--primary-color);
+        font-size: 0.9rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    [dir="rtl"] .view-all {
+        flex-direction: row-reverse;
+    }
+
+    .view-all:hover {
+        text-decoration: underline;
+    }
+
+    /* Quick Actions Section */
+    .quick-actions {
+        margin-bottom: 20px;
+    }
+
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 16px;
+    }
+
+    .action-card {
+        background-color: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 20px;
+        text-align: center;
+        transition: var(--transition);
+        text-decoration: none;
+        color: var(--dark-color);
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        background-color: var(--primary-light);
+        border: 1px solid var(--primary-color);
+    }
+
+    .action-icon {
+        width: 50px;
+        height: 50px;
+        margin: 0 auto 15px;
+        background-color: var(--primary-light);
+        color: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        transition: var(--transition);
+    }
+
+    .action-card:hover .action-icon {
+        background-color: var(--primary-color);
+        color: var(--white);
+    }
+
+    .action-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+
+    .action-card p {
+        font-size: 0.85rem;
+        color: var(--gray-color);
+        margin-bottom: 0;
+        transition: var(--transition);
+    }
+
+    .action-card:hover p {
+        color: var(--primary-color);
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background-color: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        width: 90%;
+        max-width: 500px;
+        padding: 20px;
+        position: relative;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: var(--dark-color);
+    }
+
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        color: var(--gray-color);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .close-modal:hover {
+        color: var(--primary-color);
+    }
+
+    .modal-body {
+        margin-bottom: 15px;
+    }
+
+    .modal-body select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--light-gray);
+        border-radius: var(--border-radius);
+        font-size: 0.95rem;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    [dir="rtl"] .modal-footer {
+        flex-direction: row-reverse;
+    }
+
+    .modal-button {
+        padding: 10px 16px;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-size: 0.95rem;
+        transition: var(--transition);
+    }
+
+    .modal-button.primary {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border: none;
+    }
+
+    .modal-button.primary:hover {
+        background-color: var(--secondary-color);
+    }
+
+    .modal-button.secondary {
+        background-color: var(--white);
+        color: var(--gray-color);
+        border: 1px solid var(--light-gray);
+    }
+
+    .modal-button.secondary:hover {
+        background-color: var(--light-color);
+        color: var(--dark-color);
+    }
+
+    /* Calculator Styles */
+    .calculator-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        font-size: 24px;
+        transition: all 0.3s ease;
+    }
+
+    .calculator-toggle:hover {
+        transform: scale(1.1);
+        background: var(--secondary-color);
+    }
+
+    .calculator-container {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 300px;
+        background: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        z-index: 1000;
+        display: none;
+        overflow: hidden;
+        border: 1px solid var(--light-gray);
+    }
+
+    .calculator-container.active {
+        display: block;
+    }
+
+    .calculator-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: var(--primary-color);
+        color: var(--white);
+    }
+
+    .calculator-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .close-calculator {
+        background: none;
+        border: none;
+        color: var(--white);
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 5px;
+    }
+
+    .calculator-display {
+        background: var(--light-color);
+        padding: 15px;
+        text-align: right;
+        border-bottom: 1px solid var(--light-gray);
+    }
+
+    .history-display {
+        min-height: 20px;
+        font-size: 0.9rem;
+        color: var(--gray-color);
+        margin-bottom: 8px;
+    }
+
+    .main-display {
+        font-size: 2rem;
+        font-weight: 600;
+        min-height: 36px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .calculator-controls {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        background: var(--light-gray);
+        border-top: 1px solid var(--light-gray);
+    }
+
+    .calc-btn {
+        border: none;
+        padding: 15px 0;
+        font-size: 1.2rem;
+        background: var(--white);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        outline: none;
+    }
+
+    .calc-btn:hover {
+        background: var(--primary-light);
+    }
+
+    .calc-btn:active {
+        background: var(--primary-color);
+        color: var(--white);
+    }
+
+    .calc-btn.operator {
+        background: var(--light-color);
+    }
+
+    .calc-btn.equals {
+        background: var(--primary-color);
+        color: var(--white);
+        grid-row: span 2;
+    }
+
+    .calc-btn.equals:hover {
+        background: var(--secondary-color);
+    }
+
+    .calc-btn.zero {
+        grid-column: span 2;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 1200px) {
+        .metrics-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 15px;
+            grid-gap: 15px;
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+        }
+
+        .header-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        [dir="rtl"] .header-content {
+            align-items: flex-end;
+        }
+
+        .header-actions {
+            width: 100%;
+            margin-top: 15px;
+            justify-content: space-between;
+        }
+
+        .language-select {
+            width: 100%;
+        }
+
+        .notifications-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-row {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            min-width: 100%;
+        }
+
+        .date-inputs {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        [dir="rtl"] .date-inputs {
+            align-items: flex-end;
+        }
+
+        .metrics-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .chart-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        [dir="rtl"] .chart-header {
+            align-items: flex-end;
+        }
+
+        .chart-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .chart-action-btn {
+            flex: 1;
+            text-align: center;
+        }
+
+        .activity-tabs {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .activity-tab {
+            padding: 12px;
+            border: none;
+            border-left: 3px solid transparent;
+        }
+
+        [dir="rtl"] .activity-tab {
+            border-left: none;
+            border-right: 3px solid transparent;
+        }
+
+        .activity-tab.active {
+            border-bottom: none;
+            border-left-color: var(--primary-color);
+        }
+
+        [dir="rtl"] .activity-tab.active {
+            border-left: none;
+            border-right-color: var(--primary-color);
+        }
+
+        .actions-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard-title {
+            font-size: 1.3rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+        }
+
+        .metric-value .amount {
+            font-size: 1.8rem;
+        }
+
+        .activity-table {
+            font-size: 0.85rem;
+        }
+
+        .activity-table th,
+        .activity-table td {
+            padding: 8px 10px;
+        }
+
+        .action-btn {
+            width: 28px;
+            height: 28px;
+        }
+
+        .chart-wrapper {
+            height: 300px;
+        }
+        
+        .calculator-container {
+            width: 280px;
+            right: 10px;
+        }
+
+        .modal-content {
+            width: 95%;
+            padding: 15px;
+        }
+    }
+    </style>
 </head>
 <body>
 <div class="dashboard-container">
@@ -291,7 +1556,6 @@
 
     <!-- Recent Activity Section -->
     <section class="activity-section">
-        <!-- Add a section title for Recent Activity -->
         <h2 class="section-title">
             <span class="title-text">{% trans "Recent Activity" %}</span>
             <i class="fas fa-history"></i>
@@ -484,223 +1748,441 @@
 
     <!-- Quick Actions Panel -->
     <section class="quick-actions">
-    <h2 class="section-title">
-        <span class="title-text">{% trans "Quick Actions" %}</span>
-        <i class="fas fa-bolt"></i>
-    </h2>
-    <div class="actions-grid">
-        <a href="{% url 'accounting:add_client' %}" class="action-card">
-            <div class="action-icon">
-                <i class="fas fa-user-plus"></i>
+        <h2 class="section-title">
+            <span class="title-text">{% trans "Quick Actions" %}</span>
+            <i class="fas fa-bolt"></i>
+        </h2>
+        <div class="actions-grid">
+            <a href="{% url 'accounting:add_client' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h3>{% trans "Add Client" %}</h3>
+                <p>{% trans "Register a new client" %}</p>
+            </a>
+            <a href="{% url 'accounting:add_invoice' %}?invoice_type=sale" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <h3>{% trans "Create Sale" %}</h3>
+                <p>{% trans "Record a new sales invoice" %}</p>
+            </a>
+            <a href="{% url 'accounting:add_invoice' %}?invoice_type=purchase" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <h3>{% trans "Create Purchase" %}</h3>
+                <p>{% trans "Record a new purchase invoice" %}</p>
+            </a>
+            <a href="{% url 'accounting:add_supplier' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-industry"></i>
+                </div>
+                <h3>{% trans "Add Supplier" %}</h3>
+                <p>{% trans "Register a new supplier" %}</p>
+            </a>
+            <a href="{% url 'accounting:add_product' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-cube"></i>
+                </div>
+                <h3>{% trans "Add Product" %}</h3>
+                <p>{% trans "Add a new inventory item" %}</p>
+            </a>
+            <a href="{% url 'accounting:add_payment' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <h3>{% trans "Record Payment" %}</h3>
+                <p>{% trans "Record a payment transaction" %}</p>
+            </a>
+            <!-- View Actions -->
+            <div class="action-card" data-modal="view-clients-modal">
+                <div class="action-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>{% trans "View Clients" %}</h3>
+                <p>{% trans "Browse client records" %}</p>
             </div>
-            <h3>{% trans "Add Client" %}</h3>
-            <p>{% trans "Register a new client" %}</p>
-        </a>
-        <a href="{% url 'accounting:add_invoice' %}?invoice_type=sale" class="action-card">
-            <div class="action-icon">
-                <i class="fas fa-shopping-bag"></i>
+            <div class="action-card" data-modal="view-suppliers-modal">
+                <div class="action-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h3>{% trans "View Suppliers" %}</h3>
+                <p>{% trans "Browse supplier records" %}</p>
             </div>
-            <h3>{% trans "Create Sale" %}</h3>
-            <p>{% trans "Record a new sales invoice" %}</p>
-        </a>
-        <a href="{% url 'accounting:add_invoice' %}?invoice_type=purchase" class="action-card">
-            <div class="action-icon">
-                <i class="fas fa-box-open"></i>
+            <div class="action-card" data-modal="view-products-modal">
+                <div class="action-icon">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <h3>{% trans "View Products" %}</h3>
+                <p>{% trans "Browse inventory items" %}</p>
             </div>
-            <h3>{% trans "Create Purchase" %}</h3>
-            <p>{% trans "Record a new purchase invoice" %}</p>
-        </a>
-        <a href="{% url 'accounting:add_supplier' %}" class="action-card">
-            <div class="action-icon">
-                <i class="fas fa-industry"></i>
+            <div class="action-card" data-modal="view-invoices-modal">
+                <div class="action-icon">
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <h3>{% trans "View Invoices" %}</h3>
+                <p>{% trans "Browse invoice records" %}</p>
             </div>
-            <h3>{% trans "Add Supplier" %}</h3>
-            <p>{% trans "Register a new supplier" %}</p>
-        </a>
-        <a href="{% url 'accounting:add_product' %}" class="action-card">
-            <div class="action-icon">
-                <i class="fas fa-cube"></i>
+            <div class="action-card" data-modal="view-payments-modal">
+                <div class="action-icon">
+                    <i class="fas fa-money-check-alt"></i>
+                </div>
+                <h3>{% trans "View Payments" %}</h3>
+                <p>{% trans "Browse payment records" %}</p>
             </div>
-            <h3>{% trans "Add Product" %}</h3>
-            <p>{% trans "Add a new inventory item" %}</p>
-        </a>
-        <a href="{% url 'accounting:add_payment' %}" class="action-card">
-            <div class="action-icon">
-                <i class="fas fa-credit-card"></i>
-            </div>
-            <h3>{% trans "Record Payment" %}</h3>
-            <p>{% trans "Record a payment transaction" %}</p>
-        </a>
-    </div>
-</section>
+        </div>
+    </section>
 
-<!-- Chart.js Script -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <!-- Modals for View Actions -->
+    <div class="modal" id="view-clients-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{% trans "Select Client to View" %}</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <select id="client-select" class="filter-input">
+                    <option value="">{% trans "Select a client" %}</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button secondary close-modal">{% trans "Cancel" %}</button>
+                <button class="modal-button primary" id="view-client-btn" disabled>{% trans "View" %}</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="view-suppliers-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{% trans "Select Supplier to View" %}</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <select id="supplier-select" class="filter-input">
+                    <option value="">{% trans "Select a supplier" %}</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button secondary close-modal">{% trans "Cancel" %}</button>
+                <button class="modal-button primary" id="view-supplier-btn" disabled>{% trans "View" %}</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="view-products-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{% trans "Select Product to View" %}</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <select id="product-select" class="filter-input">
+                    <option value="">{% trans "Select a product" %}</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button secondary close-modal">{% trans "Cancel" %}</button>
+                <button class="modal-button primary" id="view-product-btn" disabled>{% trans "View" %}</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="view-invoices-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{% trans "Select Invoice to View" %}</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <select id="invoice-select" class="filter-input">
+                    <option value="">{% trans "Select an invoice" %}</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button secondary close-modal">{% trans "Cancel" %}</button>
+                <button class="modal-button primary" id="view-invoice-btn" disabled>{% trans "View" %}</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="view-payments-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{% trans "Select Payment to View" %}</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <select id="payment-select" class="filter-input">
+                    <option value="">{% trans "Select a payment" %}</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button secondary close-modal">{% trans "Cancel" %}</button>
+                <button class="modal-button primary" id="view-payment-btn" disabled>{% trans "View" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Calculator Button -->
+<div class="calculator-toggle">
+    <i class="fas fa-calculator"></i>
+</div>
+
+<!-- Calculator Container -->
+<div class="calculator-container">
+    <div class="calculator-header">
+        <h3>{% trans "Calculator" %}</h3>
+        <button class="close-calculator">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="calculator-display">
+        <div class="history-display"></div>
+        <div class="main-display">0</div>
+    </div>
+    
+    <div class="calculator-controls">
+        <button class="calc-btn mem-clear">MC</button>
+        <button class="calc-btn mem-recall">MR</button>
+        <button class="calc-btn mem-add">M+</button>
+        <button class="calc-btn mem-subtract">M-</button>
+        <button class="calc-btn clear">C</button>
+        <button class="calc-btn backspace">⌫</button>
+        <button class="calc-btn operator" data-value="÷">÷</button>
+        <button class="calc-btn operator" data-value="×">×</button>
+        
+        <button class="calc-btn number" data-value="7">7</button>
+        <button class="calc-btn number" data-value="8">8</button>
+        <button class="calc-btn number" data-value="9">9</button>
+        <button class="calc-btn operator" data-value="-">-</button>
+        
+        <button class="calc-btn number" data-value="4">4</button>
+        <button class="calc-btn number" data-value="5">5</button>
+        <button class="calc-btn number" data-value="6">6</button>
+        <button class="calc-btn operator" data-value="+">+</button>
+        
+        <button class="calc-btn number" data-value="1">1</button>
+        <button class="calc-btn number" data-value="2">2</button>
+        <button class="calc-btn number" data-value="3">3</button>
+        <button class="calc-btn equals">=</button>
+        
+        <button class="calc-btn number zero" data-value="0">0</button>
+        <button class="calc-btn decimal">.</button>
+        <button class="calc-btn percentage">%</button>
+        <button class="calc-btn operator" data-value="±">±</button>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Sales Chart
-    const ctx = document.getElementById('salesChart');
-    if (!ctx) {
-        console.error('Canvas element with ID "salesChart" not found.');
-        return;
-    }
-    
-    const chartData = {{ chart_data|safe }};
-    if (!chartData || !chartData.data) {
-        console.error('Invalid or missing chart data.');
-        return;
-    }
+    // Calculator functionality
+    const calculator = document.querySelector('.calculator-container');
+    const toggleBtn = document.querySelector('.calculator-toggle');
+    const closeBtn = document.querySelector('.close-calculator');
+    const mainDisplay = document.querySelector('.main-display');
+    const historyDisplay = document.querySelector('.history-display');
+    const calculatorControls = document.querySelector('.calculator-controls');
 
-    chartData.data.datasets[0].label = "{% trans 'Sales' %}";
-    chartData.data.datasets[0].backgroundColor = 'rgba(54, 162, 235, 0.2)';
-    chartData.data.datasets[0].borderColor = 'rgba(54, 162, 235, 1)';
-    chartData.data.datasets[0].borderWidth = 2;
-    chartData.data.datasets[0].tension = 0.4;
-    
-    chartData.data.datasets[1].label = "{% trans 'Purchases' %}";
-    chartData.data.datasets[1].backgroundColor = 'rgba(255, 99, 132, 0.2)';
-    chartData.data.datasets[1].borderColor = 'rgba(255, 99, 132, 1)';
-    chartData.data.datasets[1].borderWidth = 2;
-    chartData.data.datasets[1].tension = 0.4;
-    
-    chartData.options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'top',
-                labels: {
-                    font: {
-                        size: 14
-                    }
-                }
-            },
-            tooltip: {
-                mode: 'index',
-                intersect: false,
-                callbacks: {
-                    label: function(context) {
-                        return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' {% trans "EGP" %}';
-                    }
-                }
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                title: {
-                    display: true,
-                    text: "{% trans 'Amount (EGP)' %}",
-                    font: {
-                        size: 14,
-                        weight: 'bold'
-                    }
-                },
-                ticks: {
-                    callback: function(value) {
-                        return value.toLocaleString();
-                    }
-                }
-            },
-            x: {
-                title: {
-                    display: true,
-                    text: "{% trans 'Month' %}",
-                    font: {
-                        size: 14,
-                        weight: 'bold'
-                    }
-                }
-            }
-        },
-        animation: {
-            duration: 1000,
-            easing: 'easeInOutQuad'
+    // Calculator state
+    let currentInput = '0';
+    let previousInput = '';
+    let operation = null;
+    let memory = 0;
+    let shouldResetScreen = false;
+
+    // Toggle calculator visibility
+    toggleBtn.addEventListener('click', () => {
+        calculator.classList.toggle('active');
+    });
+
+    closeBtn.addEventListener('click', () => {
+        calculator.classList.remove('active');
+    });
+
+    // Handle calculator button clicks
+    calculatorControls.addEventListener('click', (e) => {
+        const btn = e.target.closest('.calc-btn');
+        if (!btn) return;
+
+        const btnValue = btn.textContent;
+        const btnClass = Array.from(btn.classList).find(cls => cls !== 'calc-btn');
+
+        // Handle different button types
+        if (btn.classList.contains('number')) {
+            handleNumber(btnValue);
+        } else if (btn.classList.contains('operator')) {
+            handleOperator(btnValue);
+        } else if (btnClass === 'equals') {
+            handleEquals();
+        } else if (btnClass === 'clear') {
+            handleClear();
+        } else if (btnClass === 'backspace') {
+            handleBackspace();
+        } else if (btnClass === 'decimal') {
+            handleDecimal();
+        } else if (btnClass === 'percentage') {
+            handlePercentage();
+        } else if (btnClass === 'mem-clear') {
+            memory = 0;
+        } else if (btnClass === 'mem-recall') {
+            currentInput = memory.toString();
+            updateDisplay();
+        } else if (btnClass === 'mem-add') {
+            memory += parseFloat(currentInput);
+        } else if (btnClass === 'mem-subtract') {
+            memory -= parseFloat(currentInput);
         }
-    };
-    
-    let salesChart;
-    try {
-        salesChart = new Chart(ctx.getContext('2d'), chartData);
-    } catch (error) {
-        console.error('Error initializing chart:', error);
-    }
-    
-    // Filter panel toggle
-    const filterToggle = document.querySelector('.filter-toggle');
-    const filterContent = document.querySelector('.filter-content');
-    
-    if (filterToggle && filterContent) {
-        filterToggle.addEventListener('click', function() {
-            const isExpanded = this.getAttribute('aria-expanded') === 'true';
-            this.setAttribute('aria-expanded', !isExpanded);
-            filterContent.style.display = isExpanded ? 'none' : 'block';
-            const icon = this.querySelector('i');
-            icon.className = isExpanded ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
-        });
-    } else {
-        console.warn('Filter toggle or content not found.');
-    }
-    
-    // Activity tabs
-    const activityTabs = document.querySelectorAll('.activity-tab');
-    const activityContents = document.querySelectorAll('.activity-content');
-    
-    activityTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            const targetId = this.getAttribute('data-target');
-            const targetContent = document.getElementById(targetId);
-            
-            if (!targetContent) {
-                console.warn(`Activity content with ID "${targetId}" not found.`);
-                return;
-            }
-            
-            activityTabs.forEach(t => t.classList.remove('active'));
-            activityContents.forEach(c => c.classList.remove('active'));
-            
-            this.classList.add('active');
-            targetContent.classList.add('active');
-        });
-    });
-    
-    // Chart period buttons
-    const chartPeriodBtns = document.querySelectorAll('.chart-action-btn');
-    
-    chartPeriodBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const period = this.getAttribute('data-period');
-            
-            chartPeriodBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            
-            fetchChartData(period);
-        });
     });
 
-    function fetchChartData(period) {
-        const fromDateInput = document.getElementById('from_date');
-        const toDateInput = document.getElementById('to_date');
-        const clientInput = document.getElementById('client');
-        const supplierInput = document.getElementById('supplier');
-        
-        if (!fromDateInput || !toDateInput || !clientInput || !supplierInput) {
-            console.error('One or more filter inputs not found.');
+    // Calculator functions
+    function handleNumber(number) {
+        if (currentInput === '0' || shouldResetScreen) {
+            currentInput = number;
+            shouldResetScreen = false;
+        } else {
+            currentInput += number;
+        }
+        updateDisplay();
+    }
+
+    function handleOperator(op) {
+        if (op === '±') {
+            currentInput = (parseFloat(currentInput) * -1).toString();
+            updateDisplay();
             return;
         }
-        
-        const fromDate = fromDateInput.value;
-        const toDate = toDateInput.value;
-        const clientId = clientInput.value;
-        const supplierId = supplierInput.value;
-        
-        const url = new URL('{% url "admin:accounting_chart_data" %}');
-        url.searchParams.append('from_date', fromDate);
-        url.searchParams.append('to_date', toDate);
-        url.searchParams.append('client', clientId);
-        url.searchParams.append('supplier', supplierId);
-        url.searchParams.append('period', period);
 
+        if (previousInput !== '') {
+            calculate();
+        }
+
+        operation = op;
+        previousInput = currentInput;
+        shouldResetScreen = true;
+        updateHistory();
+    }
+
+    function handleEquals() {
+        if (operation === null || shouldResetScreen) return;
+        calculate();
+    }
+
+    function calculate() {
+        let computation;
+        const prev = parseFloat(previousInput);
+        const current = parseFloat(currentInput);
+
+        if (isNaN(prev) || isNaN(current)) return;
+
+        switch (operation) {
+            case '+':
+                computation = prev + current;
+                break;
+            case '-':
+                computation = prev - current;
+                break;
+            case '×':
+                computation = prev * current;
+                break;
+            case '÷':
+                if (current === 0) {
+                    alert('{% trans "Cannot divide by zero" %}');
+                    clearAll();
+                    return;
+                }
+                computation = prev / current;
+                break;
+            default:
+                return;
+        }
+
+        currentInput = computation.toString();
+        operation = null;
+        previousInput = '';
+        shouldResetScreen = true;
+        updateHistory(true);
+        updateDisplay();
+    }
+
+    function handleClear() {
+        currentInput = '0';
+        previousInput = '';
+        operation = null;
+        updateHistory();
+        updateDisplay();
+    }
+
+    function handleBackspace() {
+        currentInput = currentInput.slice(0, -1) || '0';
+        updateDisplay();
+    }
+
+    function handleDecimal() {
+        if (shouldResetScreen) {
+            currentInput = '0.';
+            shouldResetScreen = false;
+        } else if (!currentInput.includes('.')) {
+            currentInput += '.';
+        }
+        updateDisplay();
+    }
+
+    function handlePercentage() {
+        currentInput = (parseFloat(currentInput) / 100).toString();
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        mainDisplay.textContent = currentInput;
+    }
+
+    function updateHistory(clear = false) {
+        if (clear) {
+            historyDisplay.textContent = '';
+            return;
+        }
+        historyDisplay.textContent = previousInput + ' ' + (operation || '');
+    }
+
+    // Modal handling for view actions
+    const viewActionCards = document.querySelectorAll('.action-card[data-modal]');
+    const modals = document.querySelectorAll('.modal');
+    const closeModalButtons = document.querySelectorAll('.close-modal');
+
+    viewActionCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const modalId = card.getAttribute('data-modal');
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'flex';
+                // Fetch options for the select dropdown
+                const select = modal.querySelector('select');
+                const viewButton = modal.querySelector('.modal-button.primary');
+                const model = modalId.replace('view-', '').replace('-modal', '');
+                fetchOptions(model, select, viewButton);
+            }
+        });
+    });
+
+    closeModalButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = button.closest('.modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+
+    modals.forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+
+    function fetchOptions(model, select, viewButton) {
+        const url = `/admin/${model}s/options/`;
         fetch(url)
             .then(response => {
                 if (!response.ok) {
@@ -709,1090 +2191,186 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(data => {
-                if (!data.chart_data || !data.chart_data.data) {
-                    throw new Error('Invalid chart data received.');
-                }
-                if (salesChart) {
-                    salesChart.data.labels = data.chart_data.data.labels;
-                    salesChart.data.datasets[0].data = data.chart_data.data.datasets[0].data;
-                    salesChart.data.datasets[1].data = data.chart_data.data.datasets[1].data;
-                    salesChart.update();
-                }
+                select.innerHTML = '<option value="">{% trans "Select a " %}' + model + '</option>';
+                data.options.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option.id;
+                    opt.textContent = option.name;
+                    select.appendChild(opt);
+                });
+                select.addEventListener('change', () => {
+                    viewButton.disabled = !select.value;
+                });
             })
             .catch(error => {
-                console.error('Error fetching chart data:', error);
-                alert('{% trans "Failed to update chart. Please try again." %}');
+                console.error(`Error fetching ${model} options:`, error);
+                select.innerHTML = '<option value="">{% trans "Error loading options" %}</option>';
+                viewButton.disabled = true;
             });
     }
+
+    // Handle view button clicks
+    document.querySelectorAll('.modal-button.primary').forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = button.closest('.modal');
+            const select = modal.querySelector('select');
+            const model = modal.id.replace('view-', '').replace('-modal', '');
+            if (select.value) {
+                const viewUrl = `/admin/${model}/${select.value}/view/`;
+                window.location.href = viewUrl;
+            }
+        });
+    });
+
+    // Initialize Sales Chart
+    const ctx = document.getElementById('salesChart');
+    if (!ctx) {
+        console.error('Canvas element with ID "salesChart" not found.');
+        return;
+    }
+
+    const chartData = {{ chart_data|safe }};
+    if (!chartData || !chartData.data) {
+        console.error('Invalid or missing chart data.');
+        return;
+    }
+
+    chartData.data.datasets[0].label = "{% trans 'Sales' %}";
+    chartData.data.datasets[0].backgroundColor = 'rgba(30, 75, 143, 0.1)';
+    chartData.data.datasets[0].borderColor = 'rgba(30, 75, 143, 1)';
+    chartData.data.datasets[0].borderWidth = 2;
+    chartData.data.datasets[0].tension = 0.4;
+
+    chartData.data.datasets[1].label = "{% trans 'Purchases' %}";
+    chartData.data.datasets[1].backgroundColor = 'rgba(255, 152, 0, 0.1)';
+    chartData.data.datasets[1].borderColor = 'rgba(255, 152, 0, 1)';
+    chartData.data.datasets[1].borderWidth = 2;
+    chartData.data.datasets[1].tension = 0.4;
+
+    const salesChart = new Chart(ctx, {
+        type: 'line',
+        data: chartData.data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: 'var(--dark-color)',
+                        font: {
+                            size: 14,
+                            family: "'Noto Sans Arabic', sans-serif"
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'var(--white)',
+                    titleColor: 'var(--dark-color)',
+                    bodyColor: 'var(--gray-color)',
+                    borderColor: 'var(--light-gray)',
+                    borderWidth: 1,
+                    cornerRadius: 4,
+                    padding: 10
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: 'var(--gray-color)',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: 'var(--gray-color)',
+                        font: {
+                            size: 12
+                        },
+                        callback: function(value) {
+                            return value.toLocaleString() + ' EGP';
+                        }
+                    },
+                    grid: {
+                        color: 'var(--light-gray)',
+                        borderDash: [5, 5]
+                    }
+                }
+            }
+        }
+    });
+
+    // Chart period switcher
+    const chartButtons = document.querySelectorAll('.chart-action-btn');
+    chartButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            chartButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            const period = button.dataset.period;
+            updateChartData(period);
+        });
+    });
+
+    function updateChartData(period) {
+        fetch(`/admin/accounting/chart-data/?period=${period}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                salesChart.data.labels = data.data.labels;
+                salesChart.data.datasets[0].data = data.data.datasets[0].data;
+                salesChart.data.datasets[1].data = data.data.datasets[1].data;
+                salesChart.update();
+            })
+            .catch(error => {
+                console.error('Error updating chart data:', error);
+            });
+    }
+
+    // Filter panel toggle
+    const filterToggle = document.querySelector('.filter-toggle');
+    const filterContent = document.querySelector('.filter-content');
+    if (filterToggle && filterContent) {
+        filterToggle.addEventListener('click', () => {
+            const isExpanded = filterToggle.getAttribute('aria-expanded') === 'true';
+            filterToggle.setAttribute('aria-expanded', !isExpanded);
+            filterContent.style.display = isExpanded ? 'none' : 'block';
+            filterToggle.querySelector('i').classList.toggle('fa-chevron-down');
+            filterToggle.querySelector('i').classList.toggle('fa-chevron-up');
+        });
+    }
+
+    // Activity tabs switching
+    const activityTabs = document.querySelectorAll('.activity-tab');
+    const activityContents = document.querySelectorAll('.activity-content');
+    activityTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            activityTabs.forEach(t => t.classList.remove('active'));
+            activityContents.forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            const target = document.getElementById(tab.dataset.target);
+            if (target) {
+                target.classList.add('active');
+            }
+        });
+    });
+
+    // Print button functionality (placeholder)
+    document.querySelectorAll('.action-btn.print').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('{% trans "Print functionality to be implemented" %}');
+        });
+    });
 });
 </script>
-
-<!-- Dashboard Styles -->
-<style>
-/* Base Styles */
-:root {
-    --primary-color: #4361ee;
-    --primary-light: #e6e9ff;
-    --secondary-color: #3f37c9;
-    --success-color: #4cc9f0;
-    --warning-color: #f8961e;
-    --danger-color: #f72585;
-    --info-color: #4895ef;
-    --dark-color: #2b2d42;
-    --light-color: #f8f9fa;
-    --gray-color: #6c757d;
-    --light-gray: #e9ecef;
-    --white: #ffffff;
-    --border-radius: 8px;
-    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --transition: all 0.3s ease;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: 'Noto Sans Arabic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    color: var(--dark-color);
-    background-color: #f5f7fa;
-}
-
-[dir="rtl"] {
-    direction: rtl;
-    text-align: right;
-}
-
-/* Icons (using Font Awesome) */
-i.fas, i.far {
-    font-family: 'Font Awesome 6 Free' !important;
-    font-weight: 900;
-}
-
-.fas.fa-tachometer-alt {
-    font-size: 1.4rem;
-    color: var(--white);
-}
-
-.fas.fa-bell, .fas.fa-filter, .fas.fa-chart-bar, .fas.fa-chart-line, .fas.fa-bolt, .fas.fa-history {
-    font-size: 1.2rem;
-    color: var(--dark-color);
-}
-
-.fas.fa-chevron-down, .fas.fa-chevron-up {
-    font-size: 1.2rem;
-    color: var(--gray-color);
-}
-
-.fas.fa-exclamation-triangle {
-    font-size: 1.2rem;
-    color: var(--warning-color);
-}
-
-.fas.fa-check-circle {
-    font-size: 1.2rem;
-    color: var(--info-color);
-}
-
-.fas.fa-search, .fas.fa-times, .fas.fa-dollar-sign, 
-.fas.fa-shopping-cart, .fas.fa-box, .fas.fa-users, .fas.fa-file-alt, 
-.fas.fa-list, .fas.fa-file-invoice, .fas.fa-credit-card, 
-.fas.fa-clipboard-list, .fas.fa-eye, .fas.fa-print, .fas.fa-arrow-right, 
-.fas.fa-shopping-bag, .fas.fa-box-open, .fas.fa-user-plus, 
-.fas.fa-industry, .fas.fa-cube {
-    font-size: 1.2rem;
-}
-
-/* Dashboard Container */
-.dashboard-container {
-    max-width: 1800px;
-    margin: 0 auto;
-    padding: 20px;
-    display: grid;
-    grid-gap: 24px;
-}
-
-/* Header Styles */
-.dashboard-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: var(--white);
-    padding: 20px;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    margin-bottom: 10px;
-}
-
-.header-content {
-    display: flex;
-    align-items: center;
-    width: 100%;
-}
-
-[dir="ltr"] .header-content {
-    justify-content: space-between;
-}
-
-[dir="rtl"] .header-content {
-    justify-content: flex-end;
-    flex-direction: row-reverse;
-}
-
-.dashboard-title {
-    font-size: 1.8rem;
-    font-weight: 600;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-[dir="ltr"] .dashboard-title {
-    flex-direction: row;
-}
-
-[dir="rtl"] .dashboard-title {
-    flex-direction: row-reverse;
-    text-align: right;
-    justify-content: flex-end;
-}
-
-.dashboard-title span {
-    display: inline-block;
-}
-
-.language-switcher {
-    position: relative;
-}
-
-.language-select {
-    padding: 8px 12px;
-    border-radius: var(--border-radius);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    background-color: rgba(255, 255, 255, 0.1);
-    color: var(--white);
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.language-select:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-.language-select:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
-}
-
-/* Section Titles */
-.section-title {
-    font-size: 1.4rem;
-    font-weight: 600;
-    margin-bottom: 20px;
-    color: var(--dark-color);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid var(--light-gray);
-}
-
-.section-title .title-text {
-    flex-grow: 1;
-}
-
-[dir="ltr"] .section-title {
-    flex-direction: row;
-    justify-content: flex-start;
-}
-
-[dir="rtl"] .section-title {
-    flex-direction: row;
-    justify-content: flex-end;
-    text-align: right;
-}
-
-/* Ensure chart-header containing section-title aligns correctly */
-.chart-header .section-title {
-    flex-grow: 1;
-}
-
-/* Notification Center */
-.notification-center {
-    margin-bottom: 20px;
-}
-
-.notifications-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
-}
-
-.notification-card {
-    padding: 16px;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    transition: var(--transition);
-}
-
-[dir="rtl"] .notification-card {
-    flex-direction: row-reverse;
-}
-
-.notification-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-}
-
-.notification-card.alert {
-    background-color: rgba(248, 150, 30, 0.1);
-    border-left: 4px solid var(--warning-color);
-}
-
-[dir="rtl"] .notification-card.alert {
-    border-left: none;
-    border-right: 4px solid var(--warning-color);
-}
-
-.notification-card.info {
-    background-color: rgba(72, 149, 239, 0.1);
-    border-left: 4px solid var(--info-color);
-}
-
-[dir="rtl"] .notification-card.info {
-    border-left: none;
-    border-right: 4px solid var(--info-color);
-}
-
-.notification-icon {
-    padding: 8px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.9);
-}
-
-.notification-content {
-    flex: 1;
-}
-
-.notification-content h3 {
-    font-size: 1.1rem;
-    margin-bottom: 6px;
-    color: var(--dark-color);
-}
-
-.notification-content p {
-    font-size: 0.9rem;
-    color: var(--gray-color);
-    margin-bottom: 0;
-}
-
-.notification-content a {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.notification-content a:hover {
-    text-decoration: underline;
-}
-
-.notification-time {
-    font-size: 0.8rem;
-    color: var(--gray-color);
-    white-space: nowrap;
-}
-
-/* Filter Panel */
-.filter-panel {
-    background-color: var(--white);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    overflow: hidden;
-    margin-bottom: 20px;
-}
-
-.filter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    cursor: pointer;
-    background-color: var(--light-color);
-}
-
-[dir="ltr"] .filter-header {
-    flex-direction: row;
-}
-
-[dir="rtl"] .filter-header {
-    flex-direction: row;
-    justify-content: flex-end;
-}
-
-.filter-header .section-title {
-    flex-grow: 1;
-}
-
-.filter-toggle {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
-    transition: var(--transition);
-}
-
-.filter-toggle:hover {
-    color: var(--dark-color);
-}
-
-.filter-content {
-    padding: 20px;
-    display: block;
-}
-
-.filter-form {
-    width: 100%;
-}
-
-.form-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-bottom: 10px;
-}
-
-.form-group {
-    flex: 1;
-    min-width: 200px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: var(--dark-color);
-}
-
-.filter-input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--light-gray);
-    border-radius: var(--border-radius);
-    font-size: 0.95rem;
-    transition: var(--transition);
-}
-
-.filter-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-}
-
-.date-range {
-    display: flex;
-    flex-direction: column;
-}
-
-.date-inputs {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-[dir="rtl"] .date-inputs {
-    flex-direction: row-reverse;
-}
-
-.date-separator {
-    color: var(--gray-color);
-    font-size: 0.9rem;
-}
-
-.form-group.actions {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-}
-
-[dir="rtl"] .form-group.actions {
-    flex-direction: row-reverse;
-}
-
-.filter-button {
-    padding: 10px 16px;
-    border-radius: var(--border-radius);
-    font-size: 0.95rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-[dir="rtl"] .filter-button {
-    flex-direction: row-reverse;
-}
-
-.filter-button.primary {
-    background-color: var(--primary-color);
-    color: var(--white);
-    border: none;
-}
-
-.filter-button.primary:hover {
-    background-color: var(--secondary-color);
-}
-
-.filter-button.secondary {
-    background-color: var(--white);
-    color: var(--gray-color);
-    border: 1px solid var(--light-gray);
-}
-
-.filter-button.secondary:hover {
-    background-color: var(--light-color);
-    color: var(--dark-color);
-}
-
-/* Metrics Section */
-.metrics-section {
-    margin-bottom: 20px;
-}
-
-.metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.metric-card {
-    background-color: var(--white);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    overflow: hidden;
-    transition: var(--transition);
-}
-
-.metric-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-
-.metric-header {
-    padding: 16px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: var(--light-color);
-}
-
-[dir="rtl"] .metric-header {
-    flex-direction: row-reverse;
-}
-
-.metric-header h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 0;
-    color: var(--dark-color);
-}
-
-.metric-header i {
-    font-size: 1.5rem;
-    opacity: 0.8;
-}
-
-.metric-card.sales .metric-header {
-    border-bottom: 3px solid var(--primary-color);
-}
-
-.metric-card.purchases .metric-header {
-    border-bottom: 3px solid var(--info-color);
-}
-
-.metric-card.inventory .metric-header {
-    border-bottom: 3px solid var(--warning-color);
-}
-
-.metric-card.clients .metric-header {
-    border-bottom: 3px solid var(--success-color);
-}
-
-.metric-body {
-    padding: 20px;
-}
-
-.metric-value {
-    margin-bottom: 16px;
-}
-
-.metric-value .amount {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--dark-color);
-}
-
-.metric-value .currency,
-.metric-value .unit {
-    font-size: 1rem;
-    color: var(--gray-color);
-    margin-left: 5px;
-}
-
-[dir="rtl"] .metric-value .currency,
-[dir="rtl"] .metric-value .unit {
-    margin-left: 0;
-    margin-right: 5px;
-}
-
-.metric-details {
-    display: grid;
-    gap: 12px;
-}
-
-.detail-item {
-    display: flex;
-    justify-content: space-between;
-}
-
-[dir="rtl"] .detail-item {
-    flex-direction: row-reverse;
-}
-
-.detail-item .label {
-    color: var(--gray-color);
-    font-size: 0.9rem;
-}
-
-.detail-item .value {
-    font-weight: 600;
-    color: var(--dark-color);
-}
-
-.metric-footer {
-    padding: 12px 20px;
-    background-color: var(--light-color);
-    border-top: 1px solid var(--light-gray);
-}
-
-.action-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--primary-color);
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: var(--transition);
-}
-
-[dir="rtl"] .action-link {
-    flex-direction: row-reverse;
-}
-
-.action-link:hover {
-    color: var(--secondary-color);
-    text-decoration: underline;
-}
-
-/* Visualization Section */
-.visualization-section {
-    margin-bottom: 20px;
-}
-
-.chart-container {
-    background-color: var(--white);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    padding: 20px;
-}
-
-.chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-[dir="ltr"] .chart-header {
-    flex-direction: row;
-}
-
-[dir="rtl"] .chart-header {
-    flex-direction: row;
-    justify-content: flex-end;
-}
-
-.chart-actions {
-    display: flex;
-    gap: 8px;
-}
-
-[dir="rtl"] .chart-actions {
-    flex-direction: row-reverse;
-}
-
-.chart-action-btn {
-    padding: 6px 12px;
-    background-color: var(--light-color);
-    border: 1px solid var(--light-gray);
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--gray-color);
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.chart-action-btn:hover {
-    background-color: var(--primary-light);
-    color: var(--primary-color);
-}
-
-.chart-action-btn.active {
-    background-color: var(--primary-color);
-    color: var(--white);
-    border-color: var(--primary-color);
-}
-
-.chart-wrapper {
-    position: relative;
-    height: 400px;
-    width: 100%;
-}
-
-/* Activity Section */
-.activity-section {
-    margin-bottom: 20px;
-}
-
-.activity-tabs {
-    display: flex;
-    border-bottom: 1px solid var(--light-gray);
-    margin-bottom: 20px;
-}
-
-[dir="rtl"] .activity-tabs {
-    flex-direction: row-reverse;
-}
-
-.activity-tab {
-    padding: 10px 20px;
-    background: none;
-    border: none;
-    border-bottom: 3px solid transparent;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--gray-color);
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-[dir="ltr"] .activity-tab {
-    flex-direction: row;
-}
-
-[dir="rtl"] .activity-tab {
-    flex-direction: row;
-    justify-content: flex-end;
-    text-align: right;
-}
-
-.activity-tab:hover {
-    color: var(--primary-color);
-}
-
-.activity-tab.active {
-    color: var(--primary-color);
-    border-bottom-color: var(--primary-color);
-}
-
-.activity-content {
-    display: none;
-}
-
-.activity-content.active {
-    display: block;
-}
-
-.table-responsive {
-    overflow-x: auto;
-}
-
-.activity-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.95rem;
-    background-color: var(--white);
-    box-shadow: var(--box-shadow);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-}
-
-.activity-table th,
-.activity-table td {
-    padding: 12px 16px;
-    text-align: left;
-    border-bottom: 1px solid var(--light-gray);
-}
-
-[dir="rtl"] .activity-table th,
-[dir="rtl"] .activity-table td {
-    text-align: right;
-}
-
-.activity-table th {
-    background-color: var(--light-color);
-    font-weight: 600;
-    color: var(--dark-color);
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
-}
-
-.activity-table tbody tr:hover {
-    background-color: rgba(67, 97, 238, 0.05);
-}
-
-.invoice-link {
-    color: var(--primary-color);
-    font-weight: 500;
-    text-decoration: none;
-    transition: var(--transition);
-}
-
-.invoice-link:hover {
-    text-decoration: underline;
-}
-
-.badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.badge.sale {
-    background-color: rgba(67, 97, 238, 0.1);
-    color: var(--primary-color);
-}
-
-.badge.purchase {
-    background-color: rgba(248, 150, 30, 0.1);
-    color: var(--warning-color);
-}
-
-.status-badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.status-badge.paid {
-    background-color: rgba(76, 201, 240, 0.1);
-    color: var(--success-color);
-}
-
-.status-badge.pending {
-    background-color: rgba(248, 150, 30, 0.1);
-    color: var(--warning-color);
-}
-
-.status-badge.unpaid {
-    background-color: rgba(247, 37, 133, 0.1);
-    color: var(--danger-color);
-}
-
-.action-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-[dir="rtl"] .action-buttons {
-    flex-direction: row-reverse;
-}
-
-.action-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background-color: var(--light-color);
-    color: var(--gray-color);
-    border: none;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.action-btn:hover {
-    background-color: var(--primary-light);
-    color: var(--primary-color);
-}
-
-.action-btn.print:hover {
-    background-color: rgba(248, 150, 30, 0.1);
-    color: var(--warning-color);
-}
-
-.no-data {
-    text-align: center;
-    padding: 40px;
-    color: var(--gray-color);
-    font-style: italic;
-}
-
-.table-footer {
-    margin-top: 15px;
-    text-align: right;
-}
-
-[dir="rtl"] .table-footer {
-    text-align: left;
-}
-
-.view-all {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--primary-color);
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: var(--transition);
-}
-
-[dir="rtl"] .view-all {
-    flex-direction: row-reverse;
-}
-
-.view-all:hover {
-    text-decoration: underline;
-}
-
-/* Quick Actions Section */
-.quick-actions {
-    margin-bottom: 20px;
-}
-
-.actions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 16px;
-}
-
-.action-card {
-    background-color: var(--white);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    padding: 20px;
-    text-align: center;
-    transition: var(--transition);
-    text-decoration: none;
-    color: var(--dark-color);
-}
-
-.action-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    background-color: var(--primary-light);
-    color: var(--primary-color);
-}
-
-.action-icon {
-    width: 50px;
-    height: 50px;
-    margin: 0 auto 15px;
-    background-color: var(--primary-light);
-    color: var(--primary-color);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    transition: var(--transition);
-}
-
-.action-card:hover .action-icon {
-    background-color: var(--primary-color);
-    color: var(--white);
-}
-
-.action-card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 8px;
-}
-
-.action-card p {
-    font-size: 0.85rem;
-    color: var(--gray-color);
-    margin-bottom: 0;
-    transition: var(--transition);
-}
-
-.action-card:hover p {
-    color: var(--primary-color);
-}
-
-/* Responsive Adjustments */
-@media (max-width: 1200px) {
-    .metrics-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .dashboard-container {
-        padding: 15px;
-        grid-gap: 15px;
-    }
-
-    .dashboard-title {
-        font-size: 1.5rem;
-    }
-
-    .header-content {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    [dir="rtl"] .header-content {
-        align-items: flex-end;
-    }
-
-    .header-actions {
-        width: 100%;
-    }
-
-    .language-select {
-        width: 100%;
-    }
-
-    .notifications-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .form-row {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .form-group {
-        min-width: 100%;
-    }
-
-    .date-inputs {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    [dir="rtl"] .date-inputs {
-        align-items: flex-end;
-    }
-
-    .metrics-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .chart-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    [dir="rtl"] .chart-header {
-        align-items: flex-end;
-    }
-
-    .chart-actions {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .chart-action-btn {
-        flex: 1;
-        text-align: center;
-    }
-
-    .activity-tabs {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .activity-tab {
-        padding: 12px;
-        border: none;
-        border-left: 3px solid transparent;
-    }
-
-    [dir="rtl"] .activity-tab {
-        border-left: none;
-        border-right: 3px solid transparent;
-    }
-
-    .activity-tab.active {
-        border-bottom: none;
-        border-left-color: var(--primary-color);
-    }
-
-    [dir="rtl"] .activity-tab.active {
-        border-left: none;
-        border-right-color: var(--primary-color);
-    }
-
-    .actions-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 480px) {
-    .dashboard-title {
-        font-size: 1.3rem;
-    }
-
-    .section-title {
-        font-size: 1.2rem;
-    }
-
-    .metric-value .amount {
-        font-size: 1.8rem;
-    }
-
-    .activity-table {
-        font-size: 0.85rem;
-    }
-
-    .activity-table th,
-    .activity-table td {
-        padding: 8px 10px;
-    }
-
-    .action-btn {
-        width: 28px;
-        height: 28px;
-    }
-
-    .chart-wrapper {
-        height: 300px;
-    }
-}
-</style>
 </body>
 </html>
