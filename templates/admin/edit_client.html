@@ -1,0 +1,139 @@
+{% extends "admin/base_dashboard.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Edit Client" %}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+.edit-form {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(30,75,143,0.08);
+    padding: 32px 28px 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+.form-section {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+}
+.form-section label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #1e4b8f;
+    letter-spacing: 0.02em;
+}
+.form-section input, .form-section select, .form-section textarea {
+    padding: 10px 12px;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #f8fafc;
+    transition: border 0.2s;
+}
+.form-section input:focus, .form-section select:focus, .form-section textarea:focus {
+    border-color: #4361ee;
+    outline: none;
+    background: #fff;
+}
+.form-section .errorlist {
+    color: #f44336;
+    font-size: 0.95em;
+    margin-top: 4px;
+}
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+.button.save-button {
+    background: linear-gradient(90deg, #4361ee 0%, #2c6fd1 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 32px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(67,97,238,0.08);
+    transition: background 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.button.save-button:hover {
+    background: linear-gradient(90deg, #2c6fd1 0%, #4361ee 100%);
+    box-shadow: 0 4px 16px rgba(67,97,238,0.12);
+}
+@media (max-width: 700px) {
+    .edit-form {
+        padding: 18px 8px 12px 8px;
+    }
+}
+[dir="rtl"] .edit-form {
+    text-align: right;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="view-container">
+    <div class="view-header">
+        <div class="header-content">
+            <i class="fas fa-user-edit"></i>
+            <h1>{% trans "Edit Client" %}</h1>
+        </div>
+        <div class="header-actions">
+            <a href="{% url 'accounting:view_client' client.id %}" class="button back-button">
+                <i class="fas fa-arrow-left"></i> {% trans "Back to Details" %}
+            </a>
+        </div>
+    </div>
+    <div class="view-content">
+        <form method="post" class="edit-form">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="form-section">
+                <label for="id_name">{% trans "Name" %}</label>
+                {{ form.name }}
+                {{ form.name.errors }}
+            </div>
+            <div class="form-section">
+                <label for="id_business_type">{% trans "Business Type" %}</label>
+                {{ form.business_type }}
+                {{ form.business_type.errors }}
+            </div>
+            <div class="form-section">
+                <label for="id_address">{% trans "Address" %}</label>
+                {{ form.address }}
+                {{ form.address.errors }}
+            </div>
+            <div class="form-section">
+                <label for="id_national_id">{% trans "National ID" %}</label>
+                {{ form.national_id }}
+                {{ form.national_id.errors }}
+            </div>
+            <div class="form-section">
+                <label for="id_tax_number">{% trans "Tax Number" %}</label>
+                {{ form.tax_number }}
+                {{ form.tax_number.errors }}
+            </div>
+            <div class="form-section">
+                <label for="id_num_of_invoices">{% trans "Number of Invoices" %}</label>
+                {{ form.num_of_invoices }}
+                {{ form.num_of_invoices.errors }}
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="button save-button">
+                    <i class="fas fa-save"></i> {% trans "Save" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,89 @@
+{% extends "admin/base_dashboard.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/view_details.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="view-container">
+    <div class="view-header">
+        <div class="header-content">
+            <i class="fas fa-users"></i>
+            <h1>{% trans "Clients" %}</h1>
+        </div>
+        <div class="header-actions">
+            <a href="{% url 'accounting:add_client' %}" class="button edit-button">
+                <i class="fas fa-plus"></i> {% trans "Add Client" %}
+            </a>
+        </div>
+    </div>
+
+    <div class="view-content">
+        <form method="get" class="filter-form">
+            <div class="filter-row">
+                <input type="text" name="q" value="{{ request.GET.q }}" placeholder="{% trans 'Search by name, national ID, or tax number' %}" class="filter-input" />
+                <select name="business_type" class="filter-input">
+                    <option value="">{% trans 'All Types' %}</option>
+                    <option value="individual" {% if request.GET.business_type == 'individual' %}selected{% endif %}>{% trans 'Individual' %}</option>
+                    <option value="company" {% if request.GET.business_type == 'company' %}selected{% endif %}>{% trans 'Company' %}</option>
+                </select>
+                <button type="submit" class="button">{% trans 'Filter' %}</button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>{% trans "Name" %}</th>
+                        <th>{% trans "Business Type" %}</th>
+                        <th>{% trans "National ID" %}</th>
+                        <th>{% trans "Tax Number" %}</th>
+                        <th>{% trans "Address" %}</th>
+                        <th>{% trans "# Invoices" %}</th>
+                        <th>{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                    <tr>
+                        <td>{{ client.name }}</td>
+                        <td><span class="badge {{ client.business_type }}">{{ client.get_business_type_display }}</span></td>
+                        <td>{{ client.national_id|default:"-" }}</td>
+                        <td>{{ client.tax_number|default:"-" }}</td>
+                        <td>{{ client.address|truncatechars:30 }}</td>
+                        <td>{{ client.num_of_invoices }}</td>
+                        <td>
+                            <a href="{% url 'accounting:view_client' client.id %}" class="action-link" title="{% trans 'View Details' %}">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'admin:accounting_client_change' client.id %}" class="action-link" title="{% trans 'Edit' %}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="no-data">{% trans "No clients found." %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if is_paginated %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{{ filter_querystring }}" class="button">&laquo; {% trans 'Previous' %}</a>
+            {% endif %}
+            <span class="page-info">{% trans 'Page' %} {{ page_obj.number }} {% trans 'of' %} {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{{ filter_querystring }}" class="button">{% trans 'Next' %} &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

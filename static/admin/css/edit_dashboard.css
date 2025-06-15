@@ -1,0 +1,100 @@
+/* Dashboard Edit Page Styles */
+.dashboard-edit-container {
+    max-width: 700px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    padding: 32px 24px;
+}
+.dashboard-edit-container h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.dashboard-edit-form .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 24px;
+    margin-bottom: 24px;
+}
+.dashboard-edit-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.dashboard-edit-form label {
+    font-weight: 600;
+    color: #374151;
+}
+.dashboard-edit-form input, .dashboard-edit-form select, .dashboard-edit-form textarea {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    background: #f8fafc;
+    transition: border 0.2s;
+}
+.dashboard-edit-form input:focus, .dashboard-edit-form select:focus, .dashboard-edit-form textarea:focus {
+    border: 1.5px solid #2563eb;
+    outline: none;
+}
+.dashboard-edit-form .error {
+    color: #e53e3e;
+    font-size: 0.95em;
+}
+.dashboard-edit-form .form-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+}
+.button.save-button {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.button.save-button:hover {
+    background: #1d4ed8;
+}
+.button.cancel-button {
+    background: #e0e7ef;
+    color: #374151;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+}
+.button.cancel-button:hover {
+    background: #cbd5e1;
+}
+@media (max-width: 700px) {
+    .dashboard-edit-container {
+        padding: 12px 2px;
+    }
+    .dashboard-edit-form .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+html[dir="rtl"] .dashboard-edit-container h1 {
+    flex-direction: row-reverse;
+}
+html[dir="rtl"] .dashboard-edit-form .form-actions {
+    flex-direction: row-reverse;
+}
+html[dir="rtl"] .dashboard-edit-form label {
+    text-align: right;
+} 

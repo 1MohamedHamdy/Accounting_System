@@ -1409,29 +1409,29 @@
             <!-- Sales Metrics -->
             <div class="metric-card sales">
                 <div class="metric-header">
-                    <h3>{% trans "Sales" %}</h3>
-                    <i class="fas fa-dollar-sign"></i>
+                    <h3>{% trans "Invoices" %}</h3>
+                    <i class="fas fa-file-invoice"></i>
                 </div>
                 <div class="metric-body">
                     <div class="metric-value">
-                        <span class="amount">{{ total_sales|floatformat:2|intcomma }}</span>
-                        <span class="currency">{% trans "EGP" %}</span>
+                        <span class="amount">{{ total_invoices }}</span>
+                        <span class="unit">{% trans "Invoices" %}</span>
                     </div>
                     <div class="metric-details">
                         <div class="detail-item">
-                            <span class="label">{% trans "Last 30 Days" %}</span>
-                            <span class="value">{{ recent_sales|floatformat:2|intcomma }}</span>
+                            <span class="label">{% trans "Sales" %}</span>
+                            <span class="value">{{ total_sales_invoices }}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="label">{% trans "Unpaid" %}</span>
-                            <span class="value">{{ unpaid_sales|floatformat:2|intcomma }}</span>
+                            <span class="label">{% trans "Purchases" %}</span>
+                            <span class="value">{{ total_purchase_invoices }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="metric-footer">
-                    <a href="{% url 'admin:accounting_sales_report' %}?from_date={{ from_date|default_if_none:'' }}&to_date={{ to_date|default_if_none:'' }}&client={{ selected_client|default_if_none:'' }}" class="action-link">
-                        <i class="fas fa-file-alt"></i>
-                        {% trans "Generate Report" %}
+                    <a href="{% url 'accounting:list_invoices' %}" class="action-link">
+                        <i class="fas fa-list"></i>
+                        {% trans "View Invoices" %}
                     </a>
                 </div>
             </div>
@@ -1439,29 +1439,29 @@
             <!-- Purchases Metrics -->
             <div class="metric-card purchases">
                 <div class="metric-header">
-                    <h3>{% trans "Purchases" %}</h3>
-                    <i class="fas fa-shopping-cart"></i>
+                    <h3>{% trans "Payments" %}</h3>
+                    <i class="fas fa-money-bill-wave"></i>
                 </div>
                 <div class="metric-body">
                     <div class="metric-value">
-                        <span class="amount">{{ total_purchases|floatformat:2|intcomma }}</span>
-                        <span class="currency">{% trans "EGP" %}</span>
+                        <span class="amount">{{ total_payments }}</span>
+                        <span class="unit">{% trans "Payments" %}</span>
                     </div>
                     <div class="metric-details">
                         <div class="detail-item">
-                            <span class="label">{% trans "Last 30 Days" %}</span>
-                            <span class="value">{{ recent_purchases|floatformat:2|intcomma }}</span>
+                            <span class="label">{% trans "Received" %}</span>
+                            <span class="value">{{ received_payments }}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="label">{% trans "Unpaid" %}</span>
-                            <span class="value">{{ unpaid_purchases|floatformat:2|intcomma }}</span>
+                            <span class="label">{% trans "Pending" %}</span>
+                            <span class="value">{{ pending_payments }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="metric-footer">
-                    <a href="{% url 'admin:accounting_purchases_report' %}?from_date={{ from_date|default_if_none:'' }}&to_date={{ to_date|default_if_none:'' }}&supplier={{ selected_supplier|default_if_none:'' }}" class="action-link">
-                        <i class="fas fa-file-alt"></i>
-                        {% trans "Generate Report" %}
+                    <a href="{% url 'accounting:list_payments' %}" class="action-link">
+                        <i class="fas fa-list"></i>
+                        {% trans "View Payments" %}
                     </a>
                 </div>
             </div>
@@ -1469,13 +1469,13 @@
             <!-- Inventory Metrics -->
             <div class="metric-card inventory">
                 <div class="metric-header">
-                    <h3>{% trans "Inventory" %}</h3>
+                    <h3>{% trans "Products" %}</h3>
                     <i class="fas fa-box"></i>
                 </div>
                 <div class="metric-body">
                     <div class="metric-value">
-                        <span class="amount">{{ low_stock_products }}</span>
-                        <span class="unit">{% trans "Items" %}</span>
+                        <span class="amount">{{ total_products }}</span>
+                        <span class="unit">{% trans "Products" %}</span>
                     </div>
                     <div class="metric-details">
                         <div class="detail-item">
@@ -1489,9 +1489,9 @@
                     </div>
                 </div>
                 <div class="metric-footer">
-                    <a href="{% url 'admin:accounting_product_changelist' %}?quantity_in_stock__lte=F('reorder_level')" class="action-link">
+                    <a href="{% url 'accounting:list_products' %}" class="action-link">
                         <i class="fas fa-list"></i>
-                        {% trans "View Inventory" %}
+                        {% trans "View Products" %}
                     </a>
                 </div>
             </div>
@@ -1639,7 +1639,7 @@
                 </table>
             </div>
             <div class="table-footer">
-                <a href="{% url 'admin:accounting_invoice_changelist' %}" class="view-all">
+                <a href="{% url 'accounting:list_invoices' %}" class="view-all">
                     {% trans "View All Invoices" %} <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
@@ -1665,7 +1665,7 @@
                             <td>{{ payment.id }}</td>
                             <td>{{ payment.payment_date|date:"Y-m-d" }}</td>
                             <td>
-                                <a href="{% url 'admin:accounting_invoice_change' payment.invoice.id %}">
+                                <a href="{% url 'accounting:view_invoice' payment.invoice.id %}" class="invoice-link">
                                     {{ payment.invoice.invoice_number }}
                                 </a>
                             </td>
@@ -1684,7 +1684,7 @@
                 </table>
             </div>
             <div class="table-footer">
-                <a href="{% url 'admin:accounting_payment_changelist' %}" class="view-all">
+                <a href="{% url 'accounting:list_payments' %}" class="view-all">
                     {% trans "View All Payments" %} <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
@@ -1796,130 +1796,43 @@
                 <p>{% trans "Record a payment transaction" %}</p>
             </a>
             <!-- View Actions -->
-            <div class="action-card" data-modal="view-clients-modal">
+            <a href="{% url 'accounting:list_clients' %}" class="action-card">
                 <div class="action-icon">
                     <i class="fas fa-users"></i>
                 </div>
                 <h3>{% trans "View Clients" %}</h3>
                 <p>{% trans "Browse client records" %}</p>
-            </div>
-            <div class="action-card" data-modal="view-suppliers-modal">
+            </a>
+            <a href="{% url 'accounting:list_suppliers' %}" class="action-card">
                 <div class="action-icon">
                     <i class="fas fa-building"></i>
                 </div>
                 <h3>{% trans "View Suppliers" %}</h3>
                 <p>{% trans "Browse supplier records" %}</p>
-            </div>
-            <div class="action-card" data-modal="view-products-modal">
+            </a>
+            <a href="{% url 'accounting:list_products' %}" class="action-card">
                 <div class="action-icon">
                     <i class="fas fa-boxes"></i>
                 </div>
                 <h3>{% trans "View Products" %}</h3>
                 <p>{% trans "Browse inventory items" %}</p>
-            </div>
-            <div class="action-card" data-modal="view-invoices-modal">
+            </a>
+            <a href="{% url 'accounting:list_invoices' %}" class="action-card">
                 <div class="action-icon">
                     <i class="fas fa-file-invoice"></i>
                 </div>
                 <h3>{% trans "View Invoices" %}</h3>
                 <p>{% trans "Browse invoice records" %}</p>
-            </div>
-            <div class="action-card" data-modal="view-payments-modal">
+            </a>
+            <a href="{% url 'accounting:list_payments' %}" class="action-card">
                 <div class="action-icon">
                     <i class="fas fa-money-check-alt"></i>
                 </div>
                 <h3>{% trans "View Payments" %}</h3>
                 <p>{% trans "Browse payment records" %}</p>
-            </div>
+            </a>
         </div>
     </section>
-
-    <!-- Modals for View Actions -->
-    <div class="modal" id="view-clients-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>{% trans "Select Client to View" %}</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <select id="client-select" class="filter-input">
-                    <option value="">{% trans "Select a client" %}</option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button class="modal-button secondary close-modal">{% trans "Cancel" %}</button>
-                <button class="modal-button primary" id="view-client-btn" disabled>{% trans "View" %}</button>
-            </div>
-        </div>
-    </div>
-    <div class="modal" id="view-suppliers-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>{% trans "Select Supplier to View" %}</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <select id="supplier-select" class="filter-input">
-                    <option value="">{% trans "Select a supplier" %}</option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button class="modal-button secondary close-modal">{% trans "Cancel" %}</button>
-                <button class="modal-button primary" id="view-supplier-btn" disabled>{% trans "View" %}</button>
-            </div>
-        </div>
-    </div>
-    <div class="modal" id="view-products-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>{% trans "Select Product to View" %}</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <select id="product-select" class="filter-input">
-                    <option value="">{% trans "Select a product" %}</option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button class="modal-button secondary close-modal">{% trans "Cancel" %}</button>
-                <button class="modal-button primary" id="view-product-btn" disabled>{% trans "View" %}</button>
-            </div>
-        </div>
-    </div>
-    <div class="modal" id="view-invoices-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>{% trans "Select Invoice to View" %}</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <select id="invoice-select" class="filter-input">
-                    <option value="">{% trans "Select an invoice" %}</option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button class="modal-button secondary close-modal">{% trans "Cancel" %}</button>
-                <button class="modal-button primary" id="view-invoice-btn" disabled>{% trans "View" %}</button>
-            </div>
-        </div>
-    </div>
-    <div class="modal" id="view-payments-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>{% trans "Select Payment to View" %}</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <select id="payment-select" class="filter-input">
-                    <option value="">{% trans "Select a payment" %}</option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button class="modal-button secondary close-modal">{% trans "Cancel" %}</button>
-                <button class="modal-button primary" id="view-payment-btn" disabled>{% trans "View" %}</button>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- Floating Calculator Button -->
@@ -2143,84 +2056,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         historyDisplay.textContent = previousInput + ' ' + (operation || '');
     }
-
-    // Modal handling for view actions
-    const viewActionCards = document.querySelectorAll('.action-card[data-modal]');
-    const modals = document.querySelectorAll('.modal');
-    const closeModalButtons = document.querySelectorAll('.close-modal');
-
-    viewActionCards.forEach(card => {
-        card.addEventListener('click', () => {
-            const modalId = card.getAttribute('data-modal');
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.style.display = 'flex';
-                // Fetch options for the select dropdown
-                const select = modal.querySelector('select');
-                const viewButton = modal.querySelector('.modal-button.primary');
-                const model = modalId.replace('view-', '').replace('-modal', '');
-                fetchOptions(model, select, viewButton);
-            }
-        });
-    });
-
-    closeModalButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const modal = button.closest('.modal');
-            if (modal) {
-                modal.style.display = 'none';
-            }
-        });
-    });
-
-    modals.forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
-    });
-
-    function fetchOptions(model, select, viewButton) {
-        const url = `/admin/${model}s/options/`;
-        fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                select.innerHTML = '<option value="">{% trans "Select a " %}' + model + '</option>';
-                data.options.forEach(option => {
-                    const opt = document.createElement('option');
-                    opt.value = option.id;
-                    opt.textContent = option.name;
-                    select.appendChild(opt);
-                });
-                select.addEventListener('change', () => {
-                    viewButton.disabled = !select.value;
-                });
-            })
-            .catch(error => {
-                console.error(`Error fetching ${model} options:`, error);
-                select.innerHTML = '<option value="">{% trans "Error loading options" %}</option>';
-                viewButton.disabled = true;
-            });
-    }
-
-    // Handle view button clicks
-    document.querySelectorAll('.modal-button.primary').forEach(button => {
-        button.addEventListener('click', () => {
-            const modal = button.closest('.modal');
-            const select = modal.querySelector('select');
-            const model = modal.id.replace('view-', '').replace('-modal', '');
-            if (select.value) {
-                const viewUrl = `/admin/${model}/${select.value}/view/`;
-                window.location.href = viewUrl;
-            }
-        });
-    });
 
     // Initialize Sales Chart
     const ctx = document.getElementById('salesChart');

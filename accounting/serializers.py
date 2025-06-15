@@ -20,7 +20,7 @@ class ClientSerializer(serializers.ModelSerializer):
         model = Client
         fields = [
             'id', 'name', 'business_type', 'business_type_display',
-            'national_id', 'tax_number', 'address', 'invoice_count',
+            'national_id', 'tax_number', 'address', 'num_of_invoices',
             'phone_numbers', 'created_at', 'updated_at'
         ]
 

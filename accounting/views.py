@@ -21,6 +21,8 @@ from .reports import generate_sales_report, generate_purchases_report
 import openpyxl
 from datetime import datetime, timedelta
 from django.db import transaction
+from django.core.paginator import Paginator
+from django.db.models import Q
 
 
 class ClientViewSet(viewsets.ModelViewSet):
@@ -386,7 +388,13 @@ def view_client(request, client_id):
             'phone_numbers': [f"{p.number} ({p.description or 'N/A'})" for p in client.clientphonenumber_set.all()]
         }
         return JsonResponse(data)
-    return render(request, 'admin/view_client.html', {'client': client})
+    paid_invoices_count = client.invoices.filter(payment_status='paid').count()
+    unpaid_invoices_count = client.invoices.filter(payment_status='unpaid').count()
+    return render(request, 'admin/view_client.html', {
+        'client': client,
+        'paid_invoices_count': paid_invoices_count,
+        'unpaid_invoices_count': unpaid_invoices_count,
+    })
 
 @login_required
 def view_supplier(request, supplier_id):
@@ -402,7 +410,14 @@ def view_supplier(request, supplier_id):
             'phone_numbers': [f"{p.number} ({p.description or 'N/A'})" for p in supplier.supplierphonenumber_set.all()]
         }
         return JsonResponse(data)
-    return render(request, 'admin/view_supplier.html', {'supplier': supplier})
+    paid_invoices_count = supplier.invoices.filter(payment_status='paid').count()
+    unpaid_invoices_count = supplier.invoices.filter(payment_status='unpaid').count()
+    context = {
+        'supplier': supplier,
+        'paid_invoices_count': paid_invoices_count,
+        'unpaid_invoices_count': unpaid_invoices_count,
+    }
+    return render(request, 'admin/view_supplier.html', context)
 
 @login_required
 def view_product(request, product_id):
@@ -459,3 +474,194 @@ def get_model_options(request, model_name):
     model = model_map[model_name]
     options = [{'id': obj.id, 'name': str(obj)} for obj in model.objects.all()]
     return JsonResponse({'options': options})
+
+@login_required
+def list_clients(request):
+    query = request.GET.get('q', '').strip()
+    business_type = request.GET.get('business_type', '')
+    page_number = request.GET.get('page', 1)
+    clients = Client.objects.all().order_by('-created_at')
+    if query:
+        clients = clients.filter(
+            Q(name__icontains=query) |
+            Q(national_id__icontains=query) |
+            Q(tax_number__icontains=query)
+        )
+    if business_type:
+        clients = clients.filter(business_type=business_type)
+    paginator = Paginator(clients, 15)
+    page_obj = paginator.get_page(page_number)
+    # For pagination links with filters
+    filter_querystring = ''
+    if query:
+        filter_querystring += f'&q={query}'
+    if business_type:
+        filter_querystring += f'&business_type={business_type}'
+    context = {
+        'clients': page_obj.object_list,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+        'filter_querystring': filter_querystring,
+        'request': request,
+    }
+    return render(request, 'admin/client_list.html', context)
+
+@login_required
+def edit_client(request, client_id):
+    client = get_object_or_404(Client, id=client_id)
+    if request.method == 'POST':
+        form = ClientForm(request.POST, instance=client)
+        if form.is_valid():
+            form.save()
+            return redirect('accounting:view_client', client_id=client.id)
+    else:
+        form = ClientForm(instance=client)
+    return render(request, 'admin/edit_client.html', {'form': form, 'client': client})
+
+@login_required
+def list_suppliers(request):
+    query = request.GET.get('q', '').strip()
+    business_type = request.GET.get('business_type', '')
+    page_number = request.GET.get('page', 1)
+    suppliers = Supplier.objects.all().order_by('-created_at')
+    if query:
+        suppliers = suppliers.filter(
+            Q(name__icontains=query) |
+            Q(supplier_code__icontains=query) |
+            Q(tax_number__icontains=query)
+        )
+    if business_type:
+        suppliers = suppliers.filter(business_type=business_type)
+    paginator = Paginator(suppliers, 15)
+    page_obj = paginator.get_page(page_number)
+    filter_querystring = ''
+    if query:
+        filter_querystring += f'&q={query}'
+    if business_type:
+        filter_querystring += f'&business_type={business_type}'
+    context = {
+        'suppliers': page_obj.object_list,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+        'filter_querystring': filter_querystring,
+        'request': request,
+    }
+    return render(request, 'admin/supplier_list.html', context)
+
+@login_required
+def edit_supplier(request, supplier_id):
+    supplier = get_object_or_404(Supplier, id=supplier_id)
+    if request.method == 'POST':
+        form = SupplierForm(request.POST, instance=supplier)
+        if form.is_valid():
+            form.save()
+            return redirect('accounting:view_supplier', supplier_id=supplier.id)
+    else:
+        form = SupplierForm(instance=supplier)
+    return render(request, 'admin/edit_supplier.html', {'form': form, 'supplier': supplier})
+
+@login_required
+def list_products(request):
+    query = request.GET.get('q', '').strip()
+    page_number = request.GET.get('page', 1)
+    products = Product.objects.all().order_by('-created_at')
+    if query:
+        products = products.filter(
+            Q(name__icontains=query) |
+            Q(code__icontains=query)
+        )
+    paginator = Paginator(products, 15)
+    page_obj = paginator.get_page(page_number)
+    filter_querystring = ''
+    if query:
+        filter_querystring += f'&q={query}'
+    context = {
+        'products': page_obj.object_list,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+        'filter_querystring': filter_querystring,
+        'request': request,
+    }
+    return render(request, 'admin/product_list.html', context)
+
+@login_required
+def edit_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if request.method == 'POST':
+        form = ProductForm(request.POST, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect('accounting:view_product', product_id=product.id)
+    else:
+        form = ProductForm(instance=product)
+    return render(request, 'admin/edit_product.html', {'form': form, 'product': product})
+
+@login_required
+def list_invoices(request):
+    query = request.GET.get('q', '').strip()
+    page_number = request.GET.get('page', 1)
+    invoices = Invoice.objects.all().order_by('-invoice_date')
+    if query:
+        invoices = invoices.filter(
+            Q(invoice_number__icontains=query)
+        )
+    paginator = Paginator(invoices, 15)
+    page_obj = paginator.get_page(page_number)
+    filter_querystring = ''
+    if query:
+        filter_querystring += f'&q={query}'
+    context = {
+        'invoices': page_obj.object_list,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+        'filter_querystring': filter_querystring,
+        'request': request,
+    }
+    return render(request, 'admin/invoice_list.html', context)
+
+@login_required
+def edit_invoice(request, invoice_id):
+    invoice = get_object_or_404(Invoice, id=invoice_id)
+    if request.method == 'POST':
+        form = InvoiceForm(request.POST, instance=invoice)
+        if form.is_valid():
+            form.save()
+            return redirect('accounting:view_invoice', invoice_id=invoice.id)
+    else:
+        form = InvoiceForm(instance=invoice)
+    return render(request, 'admin/edit_invoice.html', {'form': form, 'invoice': invoice})
+
+@login_required
+def list_payments(request):
+    query = request.GET.get('q', '').strip()
+    page_number = request.GET.get('page', 1)
+    payments = Payment.objects.all().order_by('-payment_date')
+    if query:
+        payments = payments.filter(
+            Q(notes__icontains=query)
+        )
+    paginator = Paginator(payments, 15)
+    page_obj = paginator.get_page(page_number)
+    filter_querystring = ''
+    if query:
+        filter_querystring += f'&q={query}'
+    context = {
+        'payments': page_obj.object_list,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+        'filter_querystring': filter_querystring,
+        'request': request,
+    }
+    return render(request, 'admin/payment_list.html', context)
+
+@login_required
+def edit_payment(request, payment_id):
+    payment = get_object_or_404(Payment, id=payment_id)
+    if request.method == 'POST':
+        form = PaymentForm(request.POST, instance=payment)
+        if form.is_valid():
+            form.save()
+            return redirect('accounting:view_payment', payment_id=payment.id)
+    else:
+        form = PaymentForm(instance=payment)
+    return render(request, 'admin/edit_payment.html', {'form': form, 'payment': payment})

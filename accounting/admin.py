@@ -60,12 +60,17 @@ class ClientAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
-    change_list_template = 'admin/accounting/change_list.html'
+    change_list_template = 'admin/change_list.html'
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        # Redirect to the custom edit_client page
+        return HttpResponseRedirect(reverse('accounting:edit_client', args=[object_id]))
+
     def view_link(self, obj):
         return format_html(
             '<a href="{}" class="button" style="padding: 2px 8px; background: #417690; color: white; border-radius: 3px;">{}</a>',
             reverse('admin:accounting_{}_change'.format(self.model._meta.model_name), args=[obj.id]),
-            _("View")
+            _( "View" )
         )
     view_link.short_description = ''
 
