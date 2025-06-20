@@ -1277,6 +1277,45 @@
             padding: 15px;
         }
     }
+
+    /* Professional Language Switcher */
+    .language-switcher {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 4px;
+        border-radius: 8px;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .language-switcher select {
+        background-color: transparent;
+        color: var(--white);
+        border: none;
+        padding: 8px 28px 8px 12px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 6px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .language-switcher select:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+    .language-switcher select option {
+        background-color: #2c3e50; /* A dark background for options */
+        color: var(--white);
+    }
+    /* RTL adjustments for the language switcher */
+    [dir="rtl"] .language-switcher select {
+        background-position: left 10px center;
+        padding: 8px 12px 8px 28px;
+    }
     </style>
 </head>
 <body>
