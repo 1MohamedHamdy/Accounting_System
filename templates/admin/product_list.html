@@ -94,6 +94,7 @@
                 <tr>
                     <th>{% trans "Name" %}</th>
                     <th>{% trans "Code" %}</th>
+                    <th>{% trans "QR Code" %}</th>
                     <th>{% trans "Category" %}</th>
                     <th>{% trans "Stock" %}</th>
                     <th>{% trans "Wholesale Price" %}</th>
@@ -106,6 +107,13 @@
                 <tr>
                     <td>{{ product.name }}</td>
                     <td>{{ product.code|default:"-" }}</td>
+                    <td>
+                        {% if product.qr_code %}
+                            <img src="{{ product.qr_code.url }}" alt="QR Code" style="width:38px;height:38px;border:1px solid #ddd;border-radius:4px;" />
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
                     <td>{{ product.category|default:"-" }}</td>
                     <td>{{ product.quantity_in_stock }}</td>
                     <td>{{ product.wholesale_price|floatformat:2 }}</td>
@@ -116,7 +124,7 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="7">{% trans "No products found." %}</td></tr>
+                <tr><td colspan="8">{% trans "No products found." %}</td></tr>
                 {% endfor %}
             </tbody>
         </table>

@@ -216,6 +216,17 @@
                 </div>
             </div>
             <div class="content-section">
+                <div class="section-header"><i class="fas fa-qrcode"></i> <span>{% trans "QR Code" %}</span></div>
+                {% if product.qr_code %}
+                    <div style="text-align:center;">
+                        <img src="{{ product.qr_code.url }}" alt="QR Code" style="width:140px;height:140px;border:1px solid #ddd;border-radius:8px;" />
+                        <p style="margin-top:8px;font-size:0.95rem;color:#78909c;">{% trans "This QR code is automatically generated and fixed for this product." %}</p>
+                    </div>
+                {% else %}
+                    <p class="no-data">{% trans "No QR code available." %}</p>
+                {% endif %}
+            </div>
+            <div class="content-section">
                 <div class="section-header"><i class="fas fa-chart-line"></i> <span>{% trans "Inventory & Pricing" %}</span></div>
                 <div class="stats-grid">
                     <div class="stat-item"><div class="stat-value">{{ product.quantity }}</div><div class="stat-label">{% trans "In Stock" %}</div></div>

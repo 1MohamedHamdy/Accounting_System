@@ -43,6 +43,7 @@
         display: flex;
         min-height: 100vh;
         padding: 20px;
+        direction: {% if LANGUAGE_CODE == 'ar' %}rtl{% else %}ltr{% endif %};
     }
 
     .dashboard-container {
@@ -105,6 +106,10 @@
         display: flex;
         gap: 15px;
         align-items: center;
+    }
+
+    [dir="rtl"] .header-actions {
+        flex-direction: row-reverse;
     }
 
     .language-switcher {
@@ -1405,63 +1410,33 @@
             <i class="fas fa-chart-bar"></i>
         </h2>
         
-        <div class="metrics-grid">
-            <!-- Sales Metrics -->
-            <div class="metric-card sales">
+        <div class="metrics-grid" dir="rtl">
+            <!-- Clients & Suppliers Metrics -->
+            <div class="metric-card clients">
                 <div class="metric-header">
-                    <h3>{% trans "Invoices" %}</h3>
-                    <i class="fas fa-file-invoice"></i>
+                    <h3>{% trans "Clients & Suppliers" %}</h3>
+                    <i class="fas fa-users"></i>
                 </div>
                 <div class="metric-body">
                     <div class="metric-value">
-                        <span class="amount">{{ total_invoices }}</span>
-                        <span class="unit">{% trans "Invoices" %}</span>
+                        <span class="amount">{{ total_clients }}</span>
+                        <span class="unit">{% trans "Clients" %}</span>
                     </div>
                     <div class="metric-details">
                         <div class="detail-item">
-                            <span class="label">{% trans "Sales" %}</span>
-                            <span class="value">{{ total_sales_invoices }}</span>
+                            <span class="label">{% trans "Active Clients" %}</span>
+                            <span class="value">{{ active_clients }}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="label">{% trans "Purchases" %}</span>
-                            <span class="value">{{ total_purchase_invoices }}</span>
+                            <span class="label">{% trans "Active Suppliers" %}</span>
+                            <span class="value">{{ active_suppliers }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="metric-footer">
-                    <a href="{% url 'accounting:list_invoices' %}" class="action-link">
+                    <a href="{% url 'admin:accounting_client_changelist' %}" class="action-link">
                         <i class="fas fa-list"></i>
-                        {% trans "View Invoices" %}
-                    </a>
-                </div>
-            </div>
-            
-            <!-- Purchases Metrics -->
-            <div class="metric-card purchases">
-                <div class="metric-header">
-                    <h3>{% trans "Payments" %}</h3>
-                    <i class="fas fa-money-bill-wave"></i>
-                </div>
-                <div class="metric-body">
-                    <div class="metric-value">
-                        <span class="amount">{{ total_payments }}</span>
-                        <span class="unit">{% trans "Payments" %}</span>
-                    </div>
-                    <div class="metric-details">
-                        <div class="detail-item">
-                            <span class="label">{% trans "Received" %}</span>
-                            <span class="value">{{ received_payments }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">{% trans "Pending" %}</span>
-                            <span class="value">{{ pending_payments }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="metric-footer">
-                    <a href="{% url 'accounting:list_payments' %}" class="action-link">
-                        <i class="fas fa-list"></i>
-                        {% trans "View Payments" %}
+                        {% trans "View Contacts" %}
                     </a>
                 </div>
             </div>
@@ -1496,32 +1471,62 @@
                 </div>
             </div>
             
-            <!-- Clients & Suppliers Metrics -->
-            <div class="metric-card clients">
+            <!-- Purchases Metrics -->
+            <div class="metric-card purchases">
                 <div class="metric-header">
-                    <h3>{% trans "Clients & Suppliers" %}</h3>
-                    <i class="fas fa-users"></i>
+                    <h3>{% trans "Payments" %}</h3>
+                    <i class="fas fa-money-bill-wave"></i>
                 </div>
                 <div class="metric-body">
                     <div class="metric-value">
-                        <span class="amount">{{ total_clients }}</span>
-                        <span class="unit">{% trans "Clients" %}</span>
+                        <span class="amount">{{ total_payments }}</span>
+                        <span class="unit">{% trans "Payments" %}</span>
                     </div>
                     <div class="metric-details">
                         <div class="detail-item">
-                            <span class="label">{% trans "Active Clients" %}</span>
-                            <span class="value">{{ active_clients }}</span>
+                            <span class="label">{% trans "Received" %}</span>
+                            <span class="value">{{ received_payments }}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="label">{% trans "Active Suppliers" %}</span>
-                            <span class="value">{{ active_suppliers }}</span>
+                            <span class="label">{% trans "Pending" %}</span>
+                            <span class="value">{{ pending_payments }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="metric-footer">
-                    <a href="{% url 'admin:accounting_client_changelist' %}" class="action-link">
+                    <a href="{% url 'accounting:list_payments' %}" class="action-link">
                         <i class="fas fa-list"></i>
-                        {% trans "View Contacts" %}
+                        {% trans "View Payments" %}
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Sales Metrics -->
+            <div class="metric-card sales">
+                <div class="metric-header">
+                    <h3>{% trans "Invoices" %}</h3>
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <div class="metric-body">
+                    <div class="metric-value">
+                        <span class="amount">{{ total_invoices }}</span>
+                        <span class="unit">{% trans "Invoices" %}</span>
+                    </div>
+                    <div class="metric-details">
+                        <div class="detail-item">
+                            <span class="label">{% trans "Sales" %}</span>
+                            <span class="value">{{ total_sales_invoices }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">{% trans "Purchases" %}</span>
+                            <span class="value">{{ total_purchase_invoices }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-footer">
+                    <a href="{% url 'accounting:list_invoices' %}" class="action-link">
+                        <i class="fas fa-list"></i>
+                        {% trans "View Invoices" %}
                     </a>
                 </div>
             </div>
