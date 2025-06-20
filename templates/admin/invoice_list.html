@@ -66,9 +66,141 @@
 .filter-btn:hover {
     background: #1d4ed8;
 }
+.top-bar-list {
+    max-width: 950px;
+    margin: 0 auto 1rem auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+}
+[dir="rtl"] .top-bar-list {
+    flex-direction: row-reverse;
+}
+.top-bar-pro {
+    max-width: 950px;
+    margin: 32px auto 24px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    position: relative;
+}
+.top-bar-pro .back-dashboard-btn {
+    position: absolute;
+    top: 0;
+    {% if LANGUAGE_CODE == 'ar' %}right: 0;{% else %}left: 0;{% endif %}
+    background: linear-gradient(90deg, #2563eb 60%, #2c6fd1 100%);
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.08rem;
+    box-shadow: 0 2px 12px rgba(67,97,238,0.10);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    transition: background 0.2s, box-shadow 0.2s;
+    z-index: 2;
+}
+.top-bar-pro .back-dashboard-btn:hover {
+    background: #1d4ed8;
+    box-shadow: 0 4px 16px rgba(67,97,238,0.18);
+}
+.top-bar-pro .lang-switcher-form {
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(30,75,143,0.08);
+    padding: 6px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.top-bar-pro select {
+    padding: 7px 16px;
+    border-radius: 6px;
+    border: 1px solid #cfd8dc;
+    font-size: 1rem;
+    background: #f8fafc;
+    color: #263238;
+    transition: border 0.2s;
+}
+.top-bar-pro select:focus {
+    border-color: #2563eb;
+    outline: none;
+}
+@media (max-width: 600px) {
+    .top-bar-pro {
+        flex-direction: column;
+        gap: 12px;
+        min-width: 0;
+    }
+    .top-bar-pro .back-dashboard-btn {
+        position: static;
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 8px;
+    }
+    .top-bar-pro .lang-switcher-form {
+        width: 100%;
+        justify-content: center;
+    }
+}
+.lang-switcher-beauty {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 32px 0 18px 0;
+}
+.lang-switcher-beauty form {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(30,75,143,0.10);
+    padding: 8px 24px;
+    display: flex;
+    align-items: center;
+}
+.lang-switcher-beauty select {
+    padding: 10px 24px;
+    border-radius: 8px;
+    border: 1px solid #cfd8dc;
+    font-size: 1.08rem;
+    background: #f8fafc;
+    color: #263238;
+    transition: border 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(67,97,238,0.06);
+    outline: none;
+    cursor: pointer;
+    min-width: 120px;
+}
+.lang-switcher-beauty select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px #e6f0ff;
+}
 </style>
 {% endblock %}
 {% block content %}
+<div style="margin-bottom: 18px;">
+    <a href="{% url 'admin:accounting_dashboardstats' %}" class="button" style="background: #2563eb; color: #fff; padding: 10px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+        <i class="fas fa-arrow-left"{% if LANGUAGE_CODE == 'ar' %} style="transform: scaleX(-1);"{% endif %}></i> {% trans "Back to Dashboard" %}
+    </a>
+</div>
+<div class="lang-switcher-beauty">
+    <form action="{% url 'set_language' %}" method="post">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.path }}">
+        <select name="language" onchange="this.form.submit()">
+            {% get_current_language as LANGUAGE_CODE %}
+            {% get_available_languages as LANGUAGES %}
+            {% for lang in LANGUAGES %}
+                <option value="{{ lang.0 }}" {% if lang.0 == LANGUAGE_CODE %}selected{% endif %}>{{ lang.1 }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
 <div class="dashboard-list-container">
     <div class="header-bar">
         <h1><i class="fas fa-file-invoice"></i> {% trans "Invoices" %}</h1>

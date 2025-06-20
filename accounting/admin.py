@@ -23,6 +23,12 @@ from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 import logging
 from django.utils.translation import gettext_lazy as _
+from django.utils.encoding import force_str
+from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.styles import Font
+from openpyxl.utils import get_column_letter
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -295,11 +301,48 @@ class PaymentAdmin(admin.ModelAdmin):
     readonly_fields = ('remaining_amount',)
     date_hierarchy = 'payment_date'
     change_list_template = 'admin/accounting/change_list.html'
+    actions = ['export_to_excel']
 
     def remaining_amount(self, obj):
         return obj.remaining_amount
     remaining_amount.short_description = _("Remaining Amount")
     
+    def export_to_excel(self, request, queryset):
+        if not request.user.has_perm('accounting.export_payments'):
+            self.message_user(request, _("You do not have permission to export payments."), level=messages.ERROR)
+            return
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = _('Payments')
+
+        headers = [
+            _("Payment #"), _("Date"), _("Amount"), _("Method"), _("Invoice"), _("Notes")
+        ]
+        ws.append(headers)
+
+        for payment in queryset:
+            ws.append([
+                payment.id,
+                payment.payment_date.strftime('%Y-%m-%d'),
+                payment.amount,
+                payment.get_payment_method_display(),
+                payment.invoice.invoice_number if payment.invoice else "",
+                payment.notes or ""
+            ])
+
+        bold_font = Font(bold=True)
+        for col in range(1, len(headers) + 1):
+            ws.cell(row=1, column=col).font = bold_font
+            column_letter = get_column_letter(col)
+            ws.column_dimensions[column_letter].auto_size = True
+
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=payments.xlsx'
+        wb.save(response)
+        return response
+    export_to_excel.short_description = _("Export selected payments to Excel")
+
     def view_link(self, obj):
         return format_html(
             '<a href="{}" class="button" style="padding: 2px 8px; background: #417690; color: white; border-radius: 3px;">{}</a>',
@@ -307,6 +350,9 @@ class PaymentAdmin(admin.ModelAdmin):
             _("View")
         )
     view_link.short_description = ''
+
+
+    
 
 @admin.register(DashboardStats)
 class DashboardStatsAdmin(admin.ModelAdmin):
@@ -531,6 +577,7 @@ class DashboardStatsAdmin(admin.ModelAdmin):
             path('dashboardstats/', self.admin_site.admin_view(self.changelist_view), name='accounting_dashboardstats'),
             path('sales-report/', self.admin_site.admin_view(self.sales_report), name='accounting_sales_report'),
             path('purchases-report/', self.admin_site.admin_view(self.purchases_report), name='accounting_purchases_report'),
+            path('payments-report/', self.admin_site.admin_view(self.payments_report), name='accounting_payments_report'),
             path('chart-data/', self.admin_site.admin_view(self.chart_data), name='accounting_chart_data'),
         ]
         return custom_urls + urls
@@ -544,6 +591,9 @@ class DashboardStatsAdmin(admin.ModelAdmin):
 
         stats = self.calculate_stats(request, from_date, to_date, client_id, supplier_id, period)
         return JsonResponse({'chart_data': stats['chart_data']})
+
+    
+ 
 
     def sales_report(self, request):
         if not request.user.has_perm('accounting.view_sales_report'):
@@ -562,25 +612,50 @@ class DashboardStatsAdmin(admin.ModelAdmin):
         if client_id:
             queryset = queryset.filter(client_id=client_id)
 
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = f'attachment; filename="{_("sales_report")}.csv"'
-        
-        writer = csv.writer(response)
-        writer.writerow([
-            _("Invoice Number"), _("Date"), _("Client"), _("Total Amount"),
-            _("Payment Status"), _("Items Count")
-        ])
+        # Create Excel workbook
+        wb = Workbook()
+        ws = wb.active
+        ws.title = force_str(_("Sales Report"))  # Convert gettext_lazy to string
 
+        # Sanitize header values to remove problematic characters
+        def sanitize_excel_value(value):
+            value = force_str(value)  # Convert gettext_lazy to string
+            # Replace problematic characters like '#', '*', '[', ']'
+            return re.sub(r'[#*\[\]]', '', value)
+
+        headers = [
+            sanitize_excel_value(_("Invoice Number")),
+            sanitize_excel_value(_("Date")),
+            sanitize_excel_value(_("Client")),
+            sanitize_excel_value(_("Total Amount")),
+            sanitize_excel_value(_("Payment Status")),
+            sanitize_excel_value(_("Items Count"))
+        ]
+        ws.append(headers)
+
+        # Write data rows
         for invoice in queryset:
-            writer.writerow([
+            ws.append([
                 invoice.invoice_number,
                 invoice.invoice_date.strftime('%Y-%m-%d'),
                 str(invoice.client) if invoice.client else "",
                 invoice.total_amount,
-                invoice.get_payment_status_display(),
+                force_str(invoice.get_payment_status_display()),
                 invoice.items.count()
             ])
 
+        # Apply bold font to headers and auto-size columns
+        bold_font = Font(bold=True)
+        for col in range(1, len(headers) + 1):
+            ws.cell(row=1, column=col).font = bold_font
+            column_letter = get_column_letter(col)
+            ws.column_dimensions[column_letter].auto_size = True
+
+        # Create response
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        filename = force_str(_('sales_report'))  # Compute filename outside f-string
+        response['Content-Disposition'] = f'attachment; filename="{filename}.xlsx"'  # Fixed syntax
+        wb.save(response)
         return response
 
     def purchases_report(self, request):
@@ -600,26 +675,110 @@ class DashboardStatsAdmin(admin.ModelAdmin):
         if supplier_id:
             queryset = queryset.filter(supplier_id=supplier_id)
 
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = f'attachment; filename="{_("purchases_report")}.csv"'
-        
-        writer = csv.writer(response)
-        writer.writerow([
-            _("Invoice Number"), _("Date"), _("Supplier"), _("Total Amount"),
-            _("Payment Status"), _("Items Count")
-        ])
+        # Create Excel workbook
+        wb = Workbook()
+        ws = wb.active
+        ws.title = force_str(_("Purchases Report"))  # Convert gettext_lazy to string
 
+        # Sanitize header values to remove problematic characters
+        def sanitize_excel_value(value):
+            value = force_str(value)  # Convert gettext_lazy to string
+            # Replace problematic characters like '#', '*', '[', ']'
+            return re.sub(r'[#*\[\]]', '', value)
+
+        headers = [
+            sanitize_excel_value(_("Invoice Number")),
+            sanitize_excel_value(_("Date")),
+            sanitize_excel_value(_("Supplier")),
+            sanitize_excel_value(_("Total Amount")),
+            sanitize_excel_value(_("Payment Status")),
+            sanitize_excel_value(_("Items Count"))
+        ]
+        ws.append(headers)
+
+        # Write data rows
         for invoice in queryset:
-            writer.writerow([
+            ws.append([
                 invoice.invoice_number,
                 invoice.invoice_date.strftime('%Y-%m-%d'),
                 str(invoice.supplier) if invoice.supplier else "",
                 invoice.total_amount,
-                invoice.get_payment_status_display(),
+                force_str(invoice.get_payment_status_display()),
                 invoice.items.count()
             ])
 
+        # Apply bold font to headers and auto-size columns
+        bold_font = Font(bold=True)
+        for col in range(1, len(headers) + 1):
+            ws.cell(row=1, column=col).font = bold_font
+            column_letter = get_column_letter(col)
+            ws.column_dimensions[column_letter].auto_size = True
+
+        # Create response
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        filename = force_str(_('purchases_report'))  # Compute filename outside f-string
+        response['Content-Disposition'] = f'attachment; filename="{filename}.xlsx"'  # Fixed syntax
+        wb.save(response)
         return response
+
+    def payments_report(self, request):
+        if not request.user.has_perm('accounting.export_payments'):
+            self.message_user(request, _("You do not have permission to export payments."), level=messages.ERROR)
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        method = request.GET.get('method')
+
+        queryset = Payment.objects.all()
+        if from_date:
+            queryset = queryset.filter(payment_date__gte=from_date)
+        if to_date:
+            queryset = queryset.filter(payment_date__lte=to_date)
+        if method:
+            queryset = queryset.filter(payment_method=method)
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = force_str(_("Payments"))  # Ensure title is a string
+
+        # Sanitize header values to remove problematic characters
+        def sanitize_excel_value(value):
+            value = force_str(value)  # Convert gettext_lazy to string
+            # Replace '#' with a safe alternative or remove it
+            return re.sub(r'[#]', 'No', value)
+
+        headers = [
+            sanitize_excel_value(_("Payment Number")),
+            sanitize_excel_value(_("Date")),
+            sanitize_excel_value(_("Amount")),
+            sanitize_excel_value(_("Method")),
+            sanitize_excel_value(_("Invoice")),
+            sanitize_excel_value(_("Notes"))
+        ]
+        ws.append(headers)
+
+        for payment in queryset:
+            ws.append([
+                payment.id,
+                payment.payment_date.strftime('%Y-%m-%d'),
+                payment.amount,
+                payment.get_payment_method_display(),
+                payment.invoice.invoice_number if payment.invoice else "",
+                payment.notes or ""
+            ])
+
+        bold_font = Font(bold=True)
+        for col in range(1, len(headers) + 1):
+            ws.cell(row=1, column=col).font = bold_font
+            column_letter = get_column_letter(col)
+            ws.column_dimensions[column_letter].auto_size = True
+
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=payments_report.xlsx'
+        wb.save(response)
+        return response
+        
 
 # Custom Admin Site
 class CustomAdminSite(admin.AdminSite):

@@ -7,6 +7,57 @@
 {% endblock %}
 
 {% block content %}
+<div style="margin-bottom: 18px;">
+    <a href="{% url 'admin:accounting_dashboardstats' %}" class="button" style="background: #2563eb; color: #fff; padding: 10px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+        <i class="fas fa-arrow-left"{% if LANGUAGE_CODE == 'ar' %} style="transform: scaleX(-1);"{% endif %}></i> {% trans "Back to Dashboard" %}
+    </a>
+</div>
+<div class="lang-switcher-beauty">
+    <form action="{% url 'set_language' %}" method="post">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.path }}">
+        <select name="language" onchange="this.form.submit()">
+            {% get_current_language as LANGUAGE_CODE %}
+            {% get_available_languages as LANGUAGES %}
+            {% for lang in LANGUAGES %}
+                <option value="{{ lang.0 }}" {% if lang.0 == LANGUAGE_CODE %}selected{% endif %}>{{ lang.1 }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+<style>
+.lang-switcher-beauty {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 32px 0 18px 0;
+}
+.lang-switcher-beauty form {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(30,75,143,0.10);
+    padding: 8px 24px;
+    display: flex;
+    align-items: center;
+}
+.lang-switcher-beauty select {
+    padding: 10px 24px;
+    border-radius: 8px;
+    border: 1px solid #cfd8dc;
+    font-size: 1.08rem;
+    background: #f8fafc;
+    color: #263238;
+    transition: border 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(67,97,238,0.06);
+    outline: none;
+    cursor: pointer;
+    min-width: 120px;
+}
+.lang-switcher-beauty select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px #e6f0ff;
+}
+</style>
 <div class="view-container">
     <div class="view-header">
         <div class="header-content">

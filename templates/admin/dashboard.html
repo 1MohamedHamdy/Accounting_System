@@ -1292,7 +1292,8 @@
                 <div class="language-switcher">
                     <form action="{% url 'set_language' %}" method="post">
                         {% csrf_token %}
-                        <select name="language" onchange="this.form.submit()" class="language-select">
+                        <input name="next" type="hidden" value="{{ request.path }}">
+                        <select name="language" onchange="this.form.submit()">
                             {% get_current_language as LANGUAGE_CODE %}
                             {% get_available_languages as LANGUAGES %}
                             {% for lang in LANGUAGES %}
@@ -1434,7 +1435,7 @@
                     </div>
                 </div>
                 <div class="metric-footer">
-                    <a href="{% url 'admin:accounting_client_changelist' %}" class="action-link">
+                    <a href="{% url 'accounting:list_clients' %}" class="action-link" target="_blank" rel="noopener noreferrer">
                         <i class="fas fa-list"></i>
                         {% trans "View Contacts" %}
                     </a>
@@ -1494,9 +1495,9 @@
                     </div>
                 </div>
                 <div class="metric-footer">
-                    <a href="{% url 'accounting:list_payments' %}" class="action-link">
-                        <i class="fas fa-list"></i>
-                        {% trans "View Payments" %}
+                    <a href="{% url 'admin:accounting_payments_report' %}?from_date={{ from_date|default_if_none:'' }}&to_date={{ to_date|default_if_none:'' }}&method={{ selected_method|default_if_none:'' }}" class="action-link">
+                        <i class="fas fa-file-alt"></i>
+                        {% trans "Generate Payments Report" %}
                     </a>
                 </div>
             </div>
@@ -1523,10 +1524,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="metric-footer">
-                    <a href="{% url 'accounting:list_invoices' %}" class="action-link">
-                        <i class="fas fa-list"></i>
-                        {% trans "View Invoices" %}
+                <div class="metric-footer" style="display: flex; gap: 12px; justify-content: center;">
+                    <a href="{% url 'admin:accounting_purchases_report' %}?from_date={{ from_date|default_if_none:'' }}&to_date={{ to_date|default_if_none:'' }}&supplier={{ selected_supplier|default_if_none:'' }}" class="action-link" target="_blank" rel="noopener noreferrer">
+                        <i class="fas fa-file-alt"></i>
+                        {% trans "Generate Purchases Report" %}
+                    </a>
+                    <a href="{% url 'admin:accounting_sales_report' %}?from_date={{ from_date|default_if_none:'' }}&to_date={{ to_date|default_if_none:'' }}&client={{ selected_client|default_if_none:'' }}" class="action-link" target="_blank" rel="noopener noreferrer">
+                        <i class="fas fa-file-alt"></i>
+                        {% trans "Generate Sales Report" %}
                     </a>
                 </div>
             </div>
@@ -2179,6 +2184,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterToggle = document.querySelector('.filter-toggle');
     const filterContent = document.querySelector('.filter-content');
     if (filterToggle && filterContent) {
+        // Initially expand the filter
+        filterToggle.setAttribute('aria-expanded', 'true');
+        filterContent.style.display = 'block';
+        filterToggle.querySelector('i').classList.remove('fa-chevron-down');
+        filterToggle.querySelector('i').classList.add('fa-chevron-up');
+
         filterToggle.addEventListener('click', () => {
             const isExpanded = filterToggle.getAttribute('aria-expanded') === 'true';
             filterToggle.setAttribute('aria-expanded', !isExpanded);
